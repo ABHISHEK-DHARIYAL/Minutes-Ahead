@@ -1,0 +1,2066 @@
+/* ==========================================================================
+   MINUTES AHEAD — Official Government Design System
+   Aesthetic Benchmark: e-Samanvit (Government of India / MoES / IMD Theme)
+   Pure CSS3 — Responsive, Modern, Clean Government Portal (Zero Neon)
+   ========================================================================== */
+
+:root {
+  /* Primary Green Palette (e-Samanvit Government Tokens) */
+  --clr-primary-900: #1B5E20;
+  --clr-primary-850: #256E2A;
+  --clr-primary-800: #2E7D32;
+  --clr-primary-700: #388E3C;
+  --clr-primary-600: #43A047;
+  --clr-primary-500: #4CAF50;
+  --clr-primary-400: #66BB6A;
+  --clr-primary-200: #A5D6A7;
+  --clr-primary-100: #E8F5E9;
+  --clr-primary-50:  #F1F8F2;
+
+  /* Surfaces & Backgrounds */
+  --clr-bg-page: #F6F9F6;
+  --clr-surface: #FFFFFF;
+  --clr-surface-subtle: #F9FBF9;
+  --clr-border: #D7E7D9;
+  --clr-border-light: #E8F0E8;
+
+  /* Typography */
+  --clr-text-main: #1C281D;
+  --clr-text-muted: #536955;
+  --clr-text-light: #7E9280;
+  --clr-text-inverse: #FFFFFF;
+
+  /* IMD Threat Levels */
+  --clr-imd-green: #2E7D32;
+  --clr-imd-green-bg: #E8F5E9;
+  --clr-imd-yellow: #B28900;
+  --clr-imd-yellow-bg: #FFFDE7;
+  --clr-imd-orange: #E65100;
+  --clr-imd-orange-bg: #FFF3E0;
+  --clr-imd-red: #C62828;
+  --clr-imd-red-bg: #FFEBEE;
+
+  /* National Colors */
+  --clr-saffron: #FF9933;
+  --clr-white: #FFFFFF;
+  --clr-india-green: #138808;
+  --clr-navy: #000080;
+
+  /* UI Tokens */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-full: 9999px;
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 12px rgba(27, 94, 32, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 10px 25px rgba(27, 94, 32, 0.12), 0 4px 10px rgba(0, 0, 0, 0.06);
+  --shadow-popup: 0 12px 30px rgba(0, 0, 0, 0.16);
+
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Noto Sans', sans-serif;
+  --font-hindi: 'Noto Sans Devanagari', 'Inter', sans-serif;
+}
+
+/* Base Reset */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 15px;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--clr-bg-page);
+  color: var(--clr-text-main);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ==========================================================================
+   TOP NOTIFICATION BAR (Government Banner)
+   ========================================================================== */
+.top-gov-strip {
+  background: #113814;
+  color: #E2ECE3;
+  font-size: 0.78rem;
+  padding: 4px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.top-gov-strip .gov-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.top-gov-strip .flag-symbol {
+  display: inline-flex;
+  width: 14px;
+  height: 9px;
+  border-radius: 1px;
+  overflow: hidden;
+  box-shadow: 0 0 1px #fff;
+}
+.flag-symbol span:nth-child(1) { background: var(--clr-saffron); width: 100%; height: 3px; }
+.flag-symbol span:nth-child(2) { background: #fff; width: 100%; height: 3px; }
+.flag-symbol span:nth-child(3) { background: var(--clr-india-green); width: 100%; height: 3px; }
+
+.top-gov-strip .gov-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.top-gov-strip a {
+  color: #C8E6C9;
+  text-decoration: none;
+}
+.top-gov-strip a:hover {
+  text-decoration: underline;
+}
+
+/* ==========================================================================
+   PRIMARY WHITE NAVBAR (Logo + Emblems + Controls)
+   ========================================================================== */
+.main-header {
+  background: var(--clr-surface);
+  border-bottom: 1px solid var(--clr-border);
+  box-shadow: var(--shadow-sm);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.header-inner {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 10px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+/* Left Brand & Real Digital India Logo */
+.brand-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  user-select: none;
+}
+
+.brand-logo-img {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  border-radius: 10px;
+  background: #FFF;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  padding: 2px;
+}
+
+.brand-titles {
+  display: flex;
+  flex-direction: column;
+}
+
+.brand-name {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--clr-primary-900);
+  letter-spacing: -0.02em;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  line-height: 1.2;
+}
+
+.brand-bolt {
+  font-size: 0.95rem;
+  color: #E65100;
+  display: inline-block;
+}
+
+.brand-divider {
+  height: 32px;
+  width: 1px;
+  background: var(--clr-border);
+  margin: 0 4px;
+}
+
+.digital-india-container {
+  display: flex;
+  align-items: center;
+  padding-left: 4px;
+}
+
+.digital-india-logo {
+  height: 36px;
+  width: auto;
+  max-width: 140px;
+  object-fit: contain;
+  display: block;
+  transition: transform 0.2s ease;
+}
+
+.digital-india-logo:hover {
+  transform: scale(1.03);
+}
+
+/* Center Navigation Tabs (Pill Style Benchmark from e-Samanvit) */
+.nav-tabs {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--clr-surface-subtle);
+  padding: 4px 6px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--clr-border);
+  position: relative;
+}
+
+.nav-tab-btn {
+  position: relative;
+  padding: 8px 20px;
+  border-radius: var(--radius-full);
+  border: none;
+  background: transparent;
+  color: #334155;
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.nav-tab-btn:hover {
+  color: #1b5e20;
+  background: rgba(46, 125, 50, 0.08);
+  transform: translateY(-1px);
+}
+
+.nav-tab-btn.active {
+  background: #e8f5e9;
+  color: #1b5e20;
+  font-weight: 700;
+  box-shadow: 0 1px 3px rgba(27, 94, 32, 0.1);
+}
+
+.nav-tab-btn.active::after {
+  content: "";
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 22px;
+  height: 2.5px;
+  background: #2e7d32;
+  border-radius: 2px;
+}
+
+/* Right Tools (Language Dropdown, Theme Toggle, Bell, Hamburger) */
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Language Dropdown */
+.lang-dropdown-wrapper {
+  position: relative;
+}
+
+.lang-select-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  background: var(--clr-surface);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-full);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--clr-text-main);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.lang-select-btn:hover,
+.lang-select-btn[aria-expanded="true"] {
+  border-color: var(--clr-primary-700);
+  background: var(--clr-primary-50);
+}
+
+.lang-select-btn .arrow-down {
+  font-size: 0.72rem;
+  transition: transform 0.2s ease;
+}
+
+.lang-select-btn[aria-expanded="true"] .arrow-down {
+  transform: rotate(180deg);
+}
+
+.lang-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  background: #FFFFFF;
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-md);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  min-width: 140px;
+  padding: 6px;
+  display: none;
+  flex-direction: column;
+  gap: 2px;
+  z-index: 1050;
+  animation: fadeInDown 0.15s ease-out;
+}
+
+.lang-dropdown-menu.open {
+  display: flex;
+}
+
+.lang-option-btn {
+  width: 100%;
+  text-align: left;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: transparent;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--clr-text-main);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.lang-option-btn:hover {
+  background: var(--clr-primary-50);
+  color: var(--clr-primary-900);
+}
+
+.lang-option-btn.active {
+  background: var(--clr-primary-100);
+  color: var(--clr-primary-900);
+  font-weight: 700;
+}
+
+.lang-option-btn.active::after {
+  content: "✓";
+  color: var(--clr-primary-800);
+  font-weight: 800;
+}
+
+/* Theme Toggle Button (Moon / Sun) */
+.btn-theme-toggle {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--clr-border);
+  background: var(--clr-surface);
+  color: var(--clr-text-main);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1.05rem;
+  transition: all 0.2s ease;
+}
+
+.btn-theme-toggle:hover {
+  background: var(--clr-primary-50);
+  border-color: var(--clr-primary-700);
+  transform: rotate(15deg);
+}
+
+.btn-icon-badge {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--clr-border);
+  background: var(--clr-surface);
+  color: var(--clr-text-main);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1.1rem;
+  transition: all 0.2s ease;
+}
+
+.btn-icon-badge:hover {
+  background: var(--clr-primary-50);
+  border-color: var(--clr-primary-700);
+  color: var(--clr-primary-900);
+}
+
+.alert-counter {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  background: #C62828;
+  color: #FFFFFF;
+  font-size: 0.65rem;
+  font-weight: 800;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
+.hamburger-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--clr-border);
+  background: var(--clr-surface);
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 8px;
+}
+
+.hamburger-btn span {
+  display: block;
+  width: 20px;
+  height: 2.2px;
+  background-color: var(--clr-text-main);
+  border-radius: 2px;
+  transition: transform 0.25s, opacity 0.25s;
+}
+
+.hamburger-btn:hover {
+  border-color: var(--clr-primary-700);
+  background: var(--clr-primary-50);
+}
+
+.hamburger-btn:hover span {
+  background-color: var(--clr-primary-900);
+}
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ==========================================================================
+   HERO BANNER (Forest Green + Ashoka Emblem + Tricolor Stripe)
+   ========================================================================== */
+.hero-banner {
+  background: linear-gradient(135deg, #134616 0%, #1B5E20 40%, #2E7D32 80%, #1B5E20 100%);
+  color: var(--clr-text-inverse);
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+
+/* Subtle botanical / meteorological wave background */
+.hero-banner::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.08) 0%, transparent 60%),
+                    radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.06) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.hero-inner {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 34px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+  position: relative;
+  z-index: 1;
+}
+
+.hero-left {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
+
+.hero-badge-card {
+  width: 90px;
+  height: 90px;
+  border-radius: var(--radius-lg);
+  background: #FFFFFF;
+  padding: 10px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.hero-badge-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.hero-titles h1 {
+  font-size: 2.3rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  color: #FFFFFF;
+}
+
+.hero-titles p {
+  font-size: 1.05rem;
+  color: #E2F2E4;
+  margin-top: 6px;
+  font-weight: 500;
+}
+
+.hero-meta-tags {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.hero-tag {
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(4px);
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: #FFFFFF;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.hero-right-emblem {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: var(--radius-lg);
+  padding: 14px 20px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.emblem-icon-box {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  background: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--clr-primary-900);
+  font-size: 1.8rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.emblem-texts {
+  display: flex;
+  flex-direction: column;
+}
+.emblem-texts .emb-hindi {
+  font-family: var(--font-hindi);
+  font-size: 0.96rem;
+  font-weight: 700;
+  color: #FFFFFF;
+}
+.emblem-texts .emb-eng {
+  font-size: 0.78rem;
+  color: #D3EED6;
+  font-weight: 500;
+}
+
+/* Indian Tricolor Stripe */
+.tricolor-stripe {
+  height: 6px;
+  width: 100%;
+  display: flex;
+}
+.tricolor-stripe .tri-saffron { background: var(--clr-saffron); flex: 1; }
+.tricolor-stripe .tri-white   { background: #FFFFFF; flex: 1; }
+.tricolor-stripe .tri-green   { background: var(--clr-india-green); flex: 1; }
+
+/* ==========================================================================
+   MAIN CONTENT AREA
+   ========================================================================== */
+.main-wrapper {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 24px;
+  flex: 1;
+  width: 100%;
+}
+
+.view-section {
+  display: none;
+}
+.view-section.active-view {
+  display: block;
+}
+
+/* Section Header (Like e-Samanvit Core Features Title) */
+.section-headline {
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.section-headline h2 {
+  font-size: 1.7rem;
+  font-weight: 800;
+  color: var(--clr-primary-900);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.section-headline p {
+  color: var(--clr-text-muted);
+  font-size: 0.95rem;
+}
+
+/* National Telemetry Counters (Top of Home/Dashboard) */
+.telemetry-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.telemetry-card {
+  background: var(--clr-surface);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.telemetry-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--clr-primary-500);
+}
+
+.tel-icon-box {
+  width: 46px;
+  height: 46px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+.tel-icon-box.green { background: var(--clr-primary-100); color: var(--clr-primary-800); }
+.tel-icon-box.yellow { background: var(--clr-imd-yellow-bg); color: var(--clr-imd-yellow); }
+.tel-icon-box.orange { background: var(--clr-imd-orange-bg); color: var(--clr-imd-orange); }
+.tel-icon-box.blue { background: #E3F2FD; color: #1976D2; }
+
+.tel-info h4 {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--clr-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.tel-info .tel-val {
+  font-size: 1.45rem;
+  font-weight: 800;
+  color: var(--clr-text-main);
+  line-height: 1.2;
+}
+.tel-info .tel-sub {
+  font-size: 0.72rem;
+  color: var(--clr-text-light);
+}
+
+/* ==========================================================================
+   CORE FEATURES (e-Samanvit Avatar + 3 Service Cards Layout)
+   ========================================================================== */
+.features-grid-layout {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+
+.avatar-feature-card {
+  background: var(--clr-surface);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+}
+
+.avatar-circle-wrapper {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow: 0 6px 18px rgba(46, 125, 50, 0.15);
+  border: 4px solid var(--clr-primary-100);
+  margin-bottom: 16px;
+  background: #FFF;
+}
+.avatar-circle-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatar-feature-card h3 {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--clr-primary-900);
+}
+.avatar-feature-card p {
+  font-size: 0.84rem;
+  color: var(--clr-text-muted);
+  margin-top: 4px;
+}
+
+.avatar-feature-card .trust-badge {
+  margin-top: 14px;
+  background: var(--clr-primary-50);
+  border: 1px solid var(--clr-border);
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--clr-primary-800);
+}
+
+/* Right Stack of 3 e-Samanvit Service Cards */
+.services-card-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  justify-content: center;
+}
+
+.service-card-item {
+  background: var(--clr-surface);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-md);
+  padding: 18px 24px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+}
+.service-card-item:hover {
+  transform: translateX(4px);
+  border-color: var(--clr-primary-600);
+  box-shadow: var(--shadow-md);
+  background: var(--clr-surface-subtle);
+}
+
+.srv-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  background: var(--clr-primary-100);
+  color: var(--clr-primary-900);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+.srv-details {
+  flex: 1;
+}
+.srv-details h4 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--clr-primary-900);
+}
+.srv-details p {
+  font-size: 0.85rem;
+  color: var(--clr-text-muted);
+  margin-top: 2px;
+}
+
+.srv-arrow {
+  color: var(--clr-text-light);
+  font-size: 1.3rem;
+  transition: transform 0.2s;
+}
+.service-card-item:hover .srv-arrow {
+  transform: translateX(4px);
+  color: var(--clr-primary-800);
+}
+
+/* ==========================================================================
+   GOOGLE-MAPS STYLE INDIA MAP CONTAINER & DASHBOARD
+   ========================================================================== */
+.map-section-container {
+  background: var(--clr-surface);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  margin-bottom: 28px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Top Toolbar for Map */
+.map-toolbar {
+  padding: 12px 18px;
+  background: #FFFFFF;
+  border-bottom: 1px solid var(--clr-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  z-index: 10;
+}
+
+.map-toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.search-box-wrapper {
+  position: relative;
+  width: 280px;
+}
+.search-box-wrapper input {
+  width: 100%;
+  padding: 8px 14px 8px 34px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--clr-border);
+  background: var(--clr-bg-page);
+  font-size: 0.85rem;
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.2s, background 0.2s;
+}
+.search-box-wrapper input:focus {
+  border-color: var(--clr-primary-700);
+  background: #FFF;
+}
+.search-box-wrapper .search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--clr-text-light);
+  font-size: 0.9rem;
+}
+
+.map-layer-toggles {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.layer-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  background: var(--clr-bg-page);
+  border: 1px solid var(--clr-border);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--clr-text-main);
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.15s ease;
+}
+.layer-chip input {
+  cursor: pointer;
+  accent-color: var(--clr-primary-800);
+}
+.layer-chip:hover {
+  border-color: var(--clr-primary-500);
+  background: var(--clr-primary-50);
+}
+
+.map-toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.view-mode-toggle {
+  display: inline-flex;
+  background: var(--clr-bg-page);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-full);
+  padding: 2px;
+}
+
+.view-mode-btn {
+  padding: 5px 12px;
+  border-radius: var(--radius-full);
+  border: none;
+  background: transparent;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--clr-text-muted);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.2s;
+}
+.view-mode-btn.active {
+  background: var(--clr-primary-800);
+  color: #FFF;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.15);
+}
+
+.btn-center-india {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+  background: var(--clr-primary-100);
+  border: 1px solid var(--clr-border);
+  color: var(--clr-primary-900);
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-center-india:hover {
+  background: var(--clr-primary-800);
+  color: #FFF;
+}
+
+/* Map Main Workspace: 3-column layout (Left list, Map center, Right details) */
+.map-workspace-grid {
+  display: grid;
+  grid-template-columns: 290px 1fr 320px;
+  height: 640px;
+  position: relative;
+  background: #E5E9E5;
+}
+
+/* If full map mode or condensed */
+.map-workspace-grid.collapsed-sides {
+  grid-template-columns: 1fr;
+}
+
+/* Left Panel: Stations & Radars List */
+.map-side-panel {
+  background: #FFFFFF;
+  border-right: 1px solid var(--clr-border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 5;
+}
+
+.panel-header {
+  padding: 12px 16px;
+  background: var(--clr-surface-subtle);
+  border-bottom: 1px solid var(--clr-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.panel-header h3 {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--clr-primary-900);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.panel-badge {
+  background: var(--clr-primary-100);
+  color: var(--clr-primary-900);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+}
+
+.panel-scroll-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.station-item-card {
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--clr-border-light);
+  background: var(--clr-surface);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.station-item-card:hover {
+  border-color: var(--clr-primary-500);
+  background: var(--clr-primary-50);
+  transform: translateX(2px);
+}
+.station-item-card.selected {
+  border-color: var(--clr-primary-800);
+  background: var(--clr-primary-100);
+}
+
+.station-text-main {
+  display: flex;
+  flex-direction: column;
+}
+.station-name-title {
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--clr-text-main);
+}
+.station-state-sub {
+  font-size: 0.72rem;
+  color: var(--clr-text-muted);
+}
+
+.station-status-pill {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  background: #E8F5E9;
+  color: #1B5E20;
+}
+.station-status-pill.dwr {
+  background: #E3F2FD;
+  color: #0D47A1;
+}
+
+/* Center Map View */
+.map-canvas-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+#india-leaflet-map {
+  width: 100%;
+  height: 100%;
+  background: #EBF0EB;
+}
+
+/* Instructional Click Helper Banner over Map */
+.map-click-instruction {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.94);
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--clr-border);
+  padding: 6px 16px;
+  border-radius: var(--radius-full);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--clr-primary-900);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+  z-index: 500;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.map-click-instruction .pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #C62828;
+  animation: pulse-ring 1.5s infinite;
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(198, 40, 40, 0.7); }
+  70% { transform: scale(1.1); box-shadow: 0 0 0 8px rgba(198, 40, 40, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(198, 40, 40, 0); }
+}
+
+/* Right Panel: Weather & Threat Inspection */
+.map-inspect-panel {
+  background: #FFFFFF;
+  border-left: 1px solid var(--clr-border);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 5;
+}
+
+.inspect-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Location Header Card */
+.location-hero-card {
+  background: var(--clr-primary-50);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-md);
+  padding: 14px;
+}
+.loc-badge-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+.threat-level-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  font-size: 0.74rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.threat-level-badge.GREEN { background: var(--clr-imd-green-bg); color: var(--clr-imd-green); border: 1px solid var(--clr-imd-green); }
+.threat-level-badge.YELLOW { background: var(--clr-imd-yellow-bg); color: var(--clr-imd-yellow); border: 1px solid #FBC02D; }
+.threat-level-badge.ORANGE { background: var(--clr-imd-orange-bg); color: var(--clr-imd-orange); border: 1px solid var(--clr-imd-orange); }
+.threat-level-badge.RED { background: var(--clr-imd-red-bg); color: var(--clr-imd-red); border: 1px solid var(--clr-imd-red); }
+
+.loc-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--clr-primary-900);
+}
+.loc-coords {
+  font-size: 0.74rem;
+  color: var(--clr-text-muted);
+  font-family: monospace;
+}
+
+/* Weather Metric Grid */
+.weather-metrics-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.metric-cell {
+  background: var(--clr-surface-subtle);
+  border: 1px solid var(--clr-border-light);
+  border-radius: var(--radius-sm);
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+}
+.metric-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--clr-text-muted);
+  text-transform: uppercase;
+}
+.metric-value {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--clr-text-main);
+  margin-top: 2px;
+}
+.metric-sub {
+  font-size: 0.68rem;
+  color: var(--clr-text-light);
+}
+
+/* Nowcast AI Assessment Card */
+.nowcast-assessment-box {
+  background: #FFF;
+  border: 1px solid var(--clr-border);
+  border-left: 4px solid var(--clr-primary-800);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+}
+.nowcast-assessment-box h4 {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--clr-primary-900);
+  margin-bottom: 4px;
+}
+.nowcast-assessment-box p {
+  font-size: 0.78rem;
+  color: var(--clr-text-muted);
+  line-height: 1.4;
+}
+
+/* Dispatch Alert Button */
+.btn-dispatch-alert {
+  padding: 10px;
+  border-radius: var(--radius-md);
+  border: none;
+  background: var(--clr-primary-800);
+  color: #FFFFFF;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 2px 6px rgba(46, 125, 50, 0.25);
+  transition: all 0.2s;
+}
+.btn-dispatch-alert:hover {
+  background: var(--clr-primary-900);
+}
+
+/* Bottom Timeline Scrubber for Map */
+.map-scrubber-bar {
+  background: #FFFFFF;
+  border-top: 1px solid var(--clr-border);
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  z-index: 10;
+}
+
+.scrubber-play-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid var(--clr-border);
+  background: var(--clr-primary-800);
+  color: #FFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+.scrubber-play-btn:hover {
+  background: var(--clr-primary-900);
+}
+
+.scrubber-steps-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+}
+
+.scrubber-step-btn {
+  border: none;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  z-index: 2;
+}
+.scrubber-step-btn .step-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #D7E7D9;
+  border: 2px solid #FFF;
+  box-shadow: 0 0 0 1px var(--clr-border);
+  transition: all 0.2s;
+}
+.scrubber-step-btn .step-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--clr-text-muted);
+}
+.scrubber-step-btn.active .step-dot {
+  background: var(--clr-primary-800);
+  box-shadow: 0 0 0 3px var(--clr-primary-100);
+}
+.scrubber-step-btn.active .step-label {
+  color: var(--clr-primary-900);
+}
+
+.scrubber-track-line {
+  position: absolute;
+  top: 6px;
+  left: 20px;
+  right: 20px;
+  height: 3px;
+  background: #E0EDE0;
+  z-index: 1;
+}
+
+/* ==========================================================================
+   SAFETY BANNER (30-30 Rule & Lightning Precautions)
+   ========================================================================== */
+.safety-banner-strip {
+  background: #FFF3E0;
+  border: 1px solid #FFE0B2;
+  border-radius: var(--radius-md);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+.safety-icon-large {
+  font-size: 2.2rem;
+  color: #E65100;
+  flex-shrink: 0;
+}
+.safety-content h4 {
+  font-size: 1rem;
+  font-weight: 800;
+  color: #BF360C;
+}
+.safety-content p {
+  font-size: 0.85rem;
+  color: #5D4037;
+  margin-top: 2px;
+}
+
+/* ==========================================================================
+   ABOUT US VIEW & ARCHITECTURE CARDS
+   ========================================================================== */
+.about-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 28px;
+}
+
+.about-card {
+  background: var(--clr-surface);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  box-shadow: var(--shadow-sm);
+}
+.about-card h3 {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--clr-primary-900);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.about-card p {
+  font-size: 0.9rem;
+  color: var(--clr-text-muted);
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+.about-card ul {
+  padding-left: 20px;
+  font-size: 0.88rem;
+  color: var(--clr-text-muted);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* ==========================================================================
+   HAMBURGER SIDE DRAWER (Sliding from Right)
+   ========================================================================== */
+.drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(2px);
+  z-index: 2000;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+.drawer-overlay.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.hamburger-drawer {
+  position: fixed;
+  top: 0;
+  right: -380px;
+  width: 360px;
+  height: 100vh;
+  background: #FFFFFF;
+  box-shadow: -5px 0 25px rgba(0, 0, 0, 0.15);
+  z-index: 2001;
+  display: flex;
+  flex-direction: column;
+  transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.hamburger-drawer.open {
+  right: 0;
+}
+
+.drawer-header {
+  padding: 18px 20px;
+  background: var(--clr-primary-900);
+  color: #FFF;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.drawer-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #FFFFFF;
+}
+
+.drawer-logo-img {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background: #FFF;
+  padding: 2px;
+}
+
+.drawer-close-btn {
+  background: transparent;
+  border: none;
+  color: #FFF;
+  font-size: 1.35rem;
+  cursor: pointer;
+  line-height: 1;
+  padding: 4px;
+  border-radius: 4px;
+  transition: background 0.15s;
+}
+
+.drawer-close-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.drawer-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.drawer-section h4 {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: var(--clr-text-light);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 10px;
+}
+
+.drawer-menu-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.drawer-menu-item {
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  color: var(--clr-text-main);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.92rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.drawer-menu-item:hover {
+  background: var(--clr-primary-100);
+  color: var(--clr-primary-900);
+  transform: translateX(3px);
+}
+
+/* Drawer Language Toggle (Clean pill segmented buttons) */
+.drawer-lang-toggle {
+  display: flex;
+  background: #F1F5F9;
+  border: 1px solid #E2E8F0;
+  border-radius: var(--radius-md);
+  padding: 3px;
+  gap: 4px;
+}
+
+.drawer-lang-btn {
+  flex: 1;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: transparent;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.drawer-lang-btn:hover {
+  color: #1E293B;
+}
+
+.drawer-lang-btn.active {
+  background: #FFFFFF;
+  color: var(--clr-primary-900);
+  font-weight: 700;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Helplines Box */
+.emergency-contact-box {
+  background: #FFF5F5;
+  border: 1px solid #FED7D7;
+  border-radius: var(--radius-md);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.emergency-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.84rem;
+  color: #4A5568;
+}
+
+.helpline-num {
+  color: #C62828;
+  font-weight: 800;
+  font-size: 0.9rem;
+  text-decoration: none;
+  background: #FFFFFF;
+  padding: 2px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid #FEB2B2;
+  transition: all 0.15s ease;
+}
+
+.helpline-num:hover {
+  background: #C62828;
+  color: #FFFFFF;
+}
+
+/* Official Portal Links */
+.drawer-portal-links {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.drawer-ext-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: #F8FAF8;
+  border: 1px solid var(--clr-border-light);
+  border-radius: var(--radius-md);
+  color: var(--clr-text-main);
+  text-decoration: none;
+  font-size: 0.88rem;
+  font-weight: 600;
+  transition: all 0.15s ease;
+}
+
+.drawer-ext-link:hover {
+  background: var(--clr-primary-50);
+  border-color: var(--clr-primary-700);
+  color: var(--clr-primary-900);
+  transform: translateX(2px);
+}
+
+.drawer-ext-link .ext-icon {
+  color: var(--clr-text-light);
+  font-size: 0.85rem;
+}
+
+/* ==========================================================================
+   FLOATING "ASK TO VAYU-MITRA" BUTTON & MODAL
+   ========================================================================== */
+.floating-vayu-btn {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: #1B5E20;
+  color: #FFFFFF;
+  border: 2px solid #A5D6A7;
+  padding: 8px 18px 8px 10px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(27, 94, 32, 0.35);
+  z-index: 1000;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.floating-vayu-btn:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 12px 30px rgba(27, 94, 32, 0.45);
+}
+
+.floating-vayu-btn img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid #FFFFFF;
+  object-fit: cover;
+}
+
+.vayu-text {
+  display: flex;
+  flex-direction: column;
+}
+.vayu-text .vayu-title {
+  font-size: 0.88rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+.vayu-text .vayu-sub {
+  font-size: 0.68rem;
+  color: #C8E6C9;
+}
+
+/* Assistant Modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(3px);
+  z-index: 3000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal-overlay.open {
+  display: flex;
+}
+
+.modal-box {
+  background: #FFFFFF;
+  width: 100%;
+  max-width: 540px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-popup);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  max-height: 85vh;
+}
+
+.modal-header {
+  padding: 16px 20px;
+  background: var(--clr-primary-900);
+  color: #FFF;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.modal-header h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.modal-close-btn {
+  background: transparent;
+  border: none;
+  color: #FFF;
+  font-size: 1.4rem;
+  cursor: pointer;
+}
+
+.modal-body {
+  padding: 20px;
+  overflow-y: auto;
+  font-size: 0.9rem;
+  color: var(--clr-text-main);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.faq-item {
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  background: var(--clr-surface-subtle);
+}
+.faq-item h5 {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--clr-primary-900);
+  margin-bottom: 4px;
+}
+.faq-item p {
+  font-size: 0.82rem;
+  color: var(--clr-text-muted);
+}
+
+/* ==========================================================================
+   FOOTER
+   ========================================================================== */
+.gov-footer {
+  background: #113814;
+  color: #C8E6C9;
+  font-size: 0.82rem;
+  padding: 24px;
+  margin-top: auto;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footer-inner {
+  max-width: 1440px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.footer-inner a {
+  color: #FFFFFF;
+  text-decoration: none;
+}
+.footer-inner a:hover {
+  text-decoration: underline;
+}
+
+/* ==========================================================================
+   LEAFLET CUSTOM MARKERS & POPUP OVERRIDES (Google Maps Clean Style)
+   ========================================================================== */
+.leaflet-popup-content-wrapper {
+  border-radius: var(--radius-md) !important;
+  box-shadow: var(--shadow-popup) !important;
+  padding: 0 !important;
+  overflow: hidden;
+  border: 1px solid var(--clr-border);
+}
+.leaflet-popup-content {
+  margin: 0 !important;
+  line-height: 1.4 !important;
+}
+
+.map-popup-card {
+  padding: 14px 16px;
+  width: 250px;
+  font-family: var(--font-sans);
+}
+.popup-badge-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+.popup-title {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--clr-primary-900);
+}
+.popup-coords {
+  font-size: 0.7rem;
+  color: var(--clr-text-muted);
+  font-family: monospace;
+}
+.popup-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin: 10px 0;
+  background: var(--clr-primary-50);
+  padding: 8px;
+  border-radius: var(--radius-sm);
+}
+.popup-cell strong {
+  display: block;
+  font-size: 0.88rem;
+  color: var(--clr-text-main);
+}
+.popup-cell span {
+  font-size: 0.65rem;
+  color: var(--clr-text-light);
+  text-transform: uppercase;
+}
+.popup-nowcast-text {
+  font-size: 0.74rem;
+  color: var(--clr-primary-900);
+  background: #E8F5E9;
+  padding: 6px 8px;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+}
+
+/* Custom Marker CSS */
+.custom-pin-marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pin-core {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #1B5E20;
+  color: #FFF;
+  border: 2px solid #FFF;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+.pin-core.radar {
+  background: #0D47A1;
+}
+.pin-core.alert {
+  background: #C62828;
+  animation: pulse-ring 1.5s infinite;
+}
+
+/* Responsive Breakpoints */
+@media (max-width: 1024px) {
+  .map-workspace-grid {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+  #india-leaflet-map {
+    height: 480px;
+  }
+  .telemetry-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .features-grid-layout {
+    grid-template-columns: 1fr;
+  }
+  .about-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .header-inner {
+    padding: 8px 16px;
+  }
+  .nav-tabs {
+    display: none; /* Accessible through Hamburger Menu on Mobile */
+  }
+  .hero-inner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .hero-right-emblem {
+    display: none;
+  }
+  .telemetry-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ==========================================================================
+   DARK THEME STYLES (Toggle via Moon/Sun icon)
+   ========================================================================== */
+body.dark-mode {
+  --clr-bg-page: #0D1610;
+  --clr-surface: #132217;
+  --clr-surface-subtle: #1A2F20;
+  --clr-text-main: #E2ECE3;
+  --clr-text-muted: #9BB89E;
+  --clr-border: #233D2A;
+  --clr-border-light: #1D3323;
+  --clr-primary-900: #E8F5E9;
+  background-color: var(--clr-bg-page);
+  color: var(--clr-text-main);
+}
+
+body.dark-mode .main-header {
+  background: #112015;
+  border-color: #233D2A;
+}
+
+body.dark-mode .nav-tabs {
+  background: #182C1E;
+  border-color: #233D2A;
+}
+
+body.dark-mode .nav-tab-btn {
+  color: #9BB89E;
+}
+
+body.dark-mode .nav-tab-btn:hover {
+  color: #A5D6A7;
+  background: rgba(165, 214, 167, 0.1);
+}
+
+body.dark-mode .nav-tab-btn.active {
+  background: #1E3B26;
+  color: #A5D6A7;
+}
+
+body.dark-mode .nav-tab-btn.active::after {
+  background: #4CAF50;
+}
+
+body.dark-mode .lang-select-btn,
+body.dark-mode .btn-theme-toggle,
+body.dark-mode .btn-icon-badge,
+body.dark-mode .hamburger-btn {
+  background: #132217;
+  border-color: #233D2A;
+  color: #E2ECE3;
+}
+
+body.dark-mode .hamburger-btn span {
+  background-color: #E2ECE3;
+}
+
+body.dark-mode .lang-dropdown-menu {
+  background: #132217;
+  border-color: #233D2A;
+}
+
+body.dark-mode .lang-option-btn {
+  color: #E2ECE3;
+}
+
+body.dark-mode .lang-option-btn:hover {
+  background: #1E3B26;
+}
+
+body.dark-mode .telemetry-card,
+body.dark-mode .avatar-feature-card,
+body.dark-mode .service-card-item,
+body.dark-mode .about-card,
+body.dark-mode .map-side-panel,
+body.dark-mode .map-inspect-panel,
+body.dark-mode .map-toolbar,
+body.dark-mode .hamburger-drawer,
+body.dark-mode .modal-box {
+  background: #132217;
+  border-color: #233D2A;
+  color: #E2ECE3;
+}
+
+body.dark-mode .metric-cell {
+  background: #1A2F20;
+  border-color: #233D2A;
+}
+
+body.dark-mode .search-box-wrapper input {
+  background: #1A2F20;
+  border-color: #233D2A;
+  color: #FFF;
+}
+
+body.dark-mode .location-hero-card {
+  background: #1A2F20;
+  border-color: #233D2A;
+}
+
+body.dark-mode .loc-title {
+  color: #E2ECE3;
+}
+
+body.dark-mode .drawer-ext-link {
+  background: #1A2F20;
+  border-color: #233D2A;
+  color: #E2ECE3;
+}
+
+body.dark-mode .drawer-lang-toggle {
+  background: #1A2F20;
+  border-color: #233D2A;
+}
+
+body.dark-mode .drawer-lang-btn {
+  color: #9BB89E;
+}
+
+body.dark-mode .drawer-lang-btn.active {
+  background: #132217;
+  color: #A5D6A7;
+}
+

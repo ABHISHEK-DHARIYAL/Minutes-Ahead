@@ -1,0 +1,434 @@
+/* ============================================================
+   MINUTES AHEAD — Master Design System (Inspired by e-Samanvit)
+   Pure Vanilla CSS Architecture — 100% Explicit, Reliable & Crisp
+   ============================================================ */
+
+:root {
+  /* ── e-Samanvit Green & Government Navy Palette ──────────── */
+  --clr-primary-900: #1B5E20;
+  --clr-primary-800: #2E7D32;
+  --clr-primary-700: #388E3C;
+  --clr-primary-600: #43A047;
+  --clr-primary-200: #C8E6C9;
+  --clr-primary-100: #E8F5E9;
+  --clr-primary-50:  #EDF7EE;
+
+  --clr-navy-900:    #0F2744;
+  --clr-navy-800:    #1E3A8A;
+  --clr-navy-700:    #2563EB;
+
+  --clr-white:       #FFFFFF;
+  --clr-gray-50:     #F8FAFC;
+  --clr-gray-100:    #F1F5F9;
+  --clr-gray-200:    #E2E8F0;
+  --clr-gray-300:    #CBD5E1;
+  --clr-gray-400:    #94A3B8;
+  --clr-gray-500:    #64748B;
+  --clr-gray-700:    #334155;
+  --clr-gray-800:    #1E293B;
+  --clr-gray-900:    #0F172A;
+
+  /* ── IMD Standard Alerts ─────────────────────────────────── */
+  --alert-green:     #15803D;
+  --alert-green-bg:  #DCFCE7;
+  --alert-green-bdr: #BBF7D0;
+
+  --alert-yellow:    #854D0E;
+  --alert-yellow-bg: #FEF9C3;
+  --alert-yellow-bdr:#FEF08A;
+
+  --alert-orange:    #C2410C;
+  --alert-orange-bg: #FFEDD5;
+  --alert-orange-bdr:#FED7AA;
+
+  --alert-red:       #B91C1C;
+  --alert-red-bg:    #FEE2E2;
+  --alert-red-bdr:   #FECACA;
+
+  /* ── Typography & Shadows ────────────────────────────────── */
+  --font-family:     'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --shadow-sm:       0 1px 3px rgba(30,30,27,0.05), 0 1px 2px rgba(30,30,27,0.03);
+  --shadow-md:       0 2px 8px rgba(46,125,50,0.08), 0 1px 3px rgba(0,0,0,0.04);
+  --shadow-lg:       0 4px 20px rgba(46,125,50,0.12), 0 2px 6px rgba(0,0,0,0.05);
+  --shadow-drawer:   -4px 0 28px rgba(15,23,42,0.18);
+
+  --radius-sm:       6px;
+  --radius-md:       10px;
+  --radius-lg:       14px;
+  --radius-xl:       20px;
+  --radius-full:     9999px;
+}
+
+/* ── Reset & Base Styles ───────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background-color: var(--clr-gray-50);
+  color: var(--clr-gray-900);
+  font-family: var(--font-family);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Common Utilities & Layout ─────────────────────────────── */
+.app-container {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background-color: var(--clr-gray-50);
+}
+
+/* ── Top Header Row 1: Brand Bar ───────────────────────────── */
+.brand-header {
+  height: 64px;
+  background-color: var(--clr-white);
+  border-bottom: 1px solid var(--clr-gray-200);
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 40;
+  flex-shrink: 0;
+}
+
+.brand-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  cursor: pointer;
+}
+
+.brand-logo-frame {
+  width: 46px;
+  height: 46px;
+  border-radius: var(--radius-full);
+  border: 2px solid var(--clr-primary-200);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--clr-white);
+  flex-shrink: 0;
+}
+
+.brand-logo-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.brand-titles {
+  display: flex;
+  flex-direction: column;
+}
+
+.brand-name-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.brand-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--clr-primary-900);
+  letter-spacing: -0.02em;
+}
+
+.brand-badge {
+  font-size: 11px;
+  font-weight: 700;
+  background-color: var(--clr-primary-100);
+  color: var(--clr-primary-800);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--clr-primary-200);
+}
+
+.brand-subtitle {
+  font-size: 12px;
+  color: var(--clr-gray-500);
+  font-weight: 500;
+}
+
+.hamburger-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background-color: var(--clr-primary-100);
+  border: 1px solid var(--clr-primary-200);
+  color: var(--clr-primary-900);
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
+}
+
+.hamburger-btn:hover {
+  background-color: var(--clr-primary-200);
+}
+
+/* ── Top Header Row 2: Navigation Bar ──────────────────────── */
+.main-navbar {
+  height: 46px;
+  background-color: var(--clr-gray-100);
+  border-bottom: 1px solid var(--clr-gray-200);
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 30;
+  flex-shrink: 0;
+}
+
+.nav-tabs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nav-tab-btn {
+  padding: 6px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--clr-gray-700);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.18s ease;
+}
+
+.nav-tab-btn:hover {
+  color: var(--clr-primary-900);
+  background-color: rgba(200, 230, 201, 0.4);
+}
+
+.nav-tab-btn.active {
+  background-color: var(--clr-primary-800);
+  color: var(--clr-white);
+  font-weight: 700;
+  box-shadow: var(--shadow-sm);
+}
+
+.nav-right-clock {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: var(--clr-white);
+  border: 1px solid var(--clr-gray-200);
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+}
+
+.clock-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #10B981;
+}
+
+.clock-label {
+  color: var(--clr-gray-500);
+  font-weight: 600;
+  font-size: 11px;
+}
+
+.clock-time {
+  font-weight: 700;
+  color: var(--clr-gray-900);
+  font-family: monospace;
+}
+
+/* ── Cards & Panels (e-Samanvit Master Style) ──────────────── */
+.esam-card {
+  background-color: var(--clr-white);
+  border: 1px solid var(--clr-gray-200);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  transition: all 0.2s ease;
+}
+
+.esam-card:hover {
+  border-color: var(--clr-primary-200);
+  box-shadow: var(--shadow-lg);
+}
+
+.floating-panel {
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--clr-gray-200);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Badges ────────────────────────────────────────────────── */
+.badge-green {
+  background-color: var(--alert-green-bg);
+  color: var(--alert-green);
+  border: 1px solid var(--alert-green-bdr);
+}
+
+.badge-yellow {
+  background-color: var(--alert-yellow-bg);
+  color: var(--alert-yellow);
+  border: 1px solid var(--alert-yellow-bdr);
+}
+
+.badge-orange {
+  background-color: var(--alert-orange-bg);
+  color: var(--alert-orange);
+  border: 1px solid var(--alert-orange-bdr);
+}
+
+.badge-red {
+  background-color: var(--alert-red-bg);
+  color: var(--alert-red);
+  border: 1px solid var(--alert-red-bdr);
+}
+
+/* ── Leaflet Controls & Custom Styling ─────────────────────── */
+.leaflet-container {
+  width: 100% !important;
+  height: 100% !important;
+  background-color: #F8FAFC !important;
+}
+
+.leaflet-control-zoom {
+  border: 1px solid var(--clr-gray-300) !important;
+  border-radius: var(--radius-md) !important;
+  box-shadow: var(--shadow-md) !important;
+  overflow: hidden;
+}
+
+.leaflet-control-zoom a {
+  background-color: var(--clr-white) !important;
+  color: var(--clr-gray-800) !important;
+  border-bottom: 1px solid var(--clr-gray-200) !important;
+  font-weight: bold !important;
+}
+
+.leaflet-control-zoom a:hover {
+  background-color: var(--clr-primary-100) !important;
+  color: var(--clr-primary-900) !important;
+}
+
+/* ── Map Top Controls (Google Maps Style) ───────────────────── */
+.map-top-bar {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.map-type-toggle {
+  background-color: var(--clr-white);
+  border: 1px solid var(--clr-gray-300);
+  border-radius: var(--radius-md);
+  padding: 3px;
+  display: flex;
+  align-items: center;
+  box-shadow: var(--shadow-md);
+}
+
+.map-type-btn {
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 700;
+  border: none;
+  background: transparent;
+  color: var(--clr-gray-600);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.map-type-btn.active {
+  background-color: var(--clr-primary-800);
+  color: var(--clr-white);
+}
+
+.map-reset-btn {
+  background-color: var(--clr-white);
+  border: 1px solid var(--clr-gray-300);
+  border-radius: var(--radius-md);
+  padding: 7px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--clr-gray-800);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: var(--shadow-md);
+}
+
+.map-reset-btn:hover {
+  background-color: var(--clr-gray-100);
+}
+
+/* ── Bottom Time Scrubber ──────────────────────────────────── */
+.bottom-scrubber-bar {
+  position: absolute;
+  bottom: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  width: 90%;
+  max-width: 820px;
+  background-color: rgba(255, 255, 255, 0.98);
+  border: 1px solid var(--clr-gray-200);
+  border-radius: var(--radius-lg);
+  padding: 10px 18px;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+/* ── Scrollbars ────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--clr-gray-100);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--clr-gray-300);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--clr-gray-400);
+}

@@ -1,0 +1,13 @@
+embed_dim: 32
+fused_dim: 64
+lstm_hidden: 64
+batch_size: 2
+epochs: 20
+lr: 0.001
+weight_decay: 0.0001
+w_refl: 0.5
+w_light: 0.4
+w_sev: 0.1
+patience: 5
+output_dir: checkpoints
+modality_dropout_prob: 0.3
