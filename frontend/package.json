@@ -5,6 +5,9 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:static": "node scripts/build-static.js",
+    "watch:static": "node scripts/watch-static.js",
+    "watch": "node scripts/watch-static.js",
     "start": "next start",
     "lint": "eslint"
   },

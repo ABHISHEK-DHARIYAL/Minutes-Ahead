@@ -27,7 +27,7 @@ export default function MetricsPanel({ mlApiUrl }: MetricsPanelProps) {
     { key: "POD_30dBZ_60min",             label: "POD",               hi: true },
     { key: "FAR_30dBZ_60min",             label: "FAR",               hi: false },
     { key: "HSS_30dBZ_60min",             label: "HSS",               hi: true },
-    { key: "Brier_lightning",             label: "Brier (⚡)",         hi: false },
+    { key: "Brier_lightning",             label: "Brier Score",       hi: false },
     { key: "baseline_persistence_CSI",    label: "Persist. CSI",      hi: true },
     { key: "baseline_optflow_CSI",        label: "OptFlow CSI",       hi: true },
   ];
@@ -35,7 +35,7 @@ export default function MetricsPanel({ mlApiUrl }: MetricsPanelProps) {
   return (
     <div className="glass-panel p-3">
       <div className="text-xs font-semibold text-slate-400 mb-2 flex items-center gap-1">
-        📊 FORECASTER METRICS <span className="text-[10px] ml-auto text-slate-600">{data.evaluation_period}</span>
+        FORECASTER METRICS <span className="text-[10px] ml-auto text-slate-600">{data.evaluation_period}</span>
       </div>
       <div className="flex flex-col gap-1.5">
         {PAIRS.map(({ key, label, hi }) => {

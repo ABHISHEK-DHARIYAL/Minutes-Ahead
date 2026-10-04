@@ -1,29 +1,110 @@
 "use client";
-import Image from "next/image";
-import { IMD_DWR_NETWORK } from "@/data/indiaData";
 
 interface HamburgerDrawerProps {
   isOpen: boolean;
   onClose: () => void;
   lang: "en" | "hi";
-  onLangChange: (l: "en" | "hi") => void;
-  currentTab: "home" | "dashboard" | "about";
-  onTabChange: (tab: "home" | "dashboard" | "about") => void;
-  muted: boolean;
-  onMuteToggle: () => void;
+  onNavigateItem: (target: "nowcast" | "minutes-ahead" | "stations" | "atmosphere" | "warnings" | "prediction") => void;
+  theme: "light" | "dark";
+  onToggleTheme: () => void;
 }
 
 export default function HamburgerDrawer({
   isOpen,
   onClose,
   lang,
-  onLangChange,
-  currentTab,
-  onTabChange,
-  muted,
-  onMuteToggle,
+  onNavigateItem,
+  theme,
+  onToggleTheme,
 }: HamburgerDrawerProps) {
   if (!isOpen) return null;
+
+  const isDark = theme === "dark";
+
+  const menuItems: {
+    id: "nowcast" | "minutes-ahead" | "stations" | "atmosphere" | "warnings" | "prediction";
+    label: string;
+    labelHi: string;
+    icon: React.ReactNode;
+  }[] = [
+    {
+      id: "nowcast",
+      label: "Live Nowcast",
+      labelHi: "लाइव नाउकास्ट",
+      icon: (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="9" />
+          <path d="M12 12l4-4" />
+          <path d="M12 3v2" />
+          <path d="M12 19v2" />
+          <path d="M3 12h2" />
+          <path d="M19 12h2" />
+        </svg>
+      ),
+    },
+    {
+      id: "minutes-ahead",
+      label: "Minutes Ahead",
+      labelHi: "मिनट्स अहेड",
+      icon: (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="10" />
+          <polyline points="12 6 12 12 16 14" />
+        </svg>
+      ),
+    },
+    {
+      id: "stations",
+      label: "Observation Stations",
+      labelHi: "वेधशाला स्टेशन",
+      icon: (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="10" />
+          <path d="m14 10-4 4" />
+          <path d="M12 6v2" />
+          <path d="M18 12h-2" />
+        </svg>
+      ),
+    },
+    {
+      id: "atmosphere",
+      label: "Atmospheric Conditions",
+      labelHi: "वायुमंडलीय स्थितियां",
+      icon: (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z" />
+        </svg>
+      ),
+    },
+    {
+      id: "warnings",
+      label: "Early Warnings",
+      labelHi: "पूर्व चेतावनियां",
+      icon: (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" />
+          <line x1="12" y1="9" x2="12" y2="13" />
+          <line x1="12" y1="17" x2="12.01" y2="17" />
+        </svg>
+      ),
+    },
+    {
+      id: "prediction",
+      label: "AI Prediction",
+      labelHi: "एआई भविष्यवाणी",
+      icon: (
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M12 2v4" />
+          <path d="M12 18v4" />
+          <path d="M4.93 4.93l2.83 2.83" />
+          <path d="M16.24 16.24l2.83 2.83" />
+          <path d="M2 12h4" />
+          <path d="M18 12h4" />
+          <circle cx="12" cy="12" r="4" />
+        </svg>
+      ),
+    },
+  ];
 
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 9999, display: "flex", justifyContent: "flex-end" }}>
@@ -32,290 +113,224 @@ export default function HamburgerDrawer({
         style={{
           position: "fixed",
           inset: 0,
-          backgroundColor: "rgba(15, 23, 42, 0.45)",
-          backdropFilter: "blur(2px)",
+          backgroundColor: isDark ? "rgba(10, 16, 10, 0.7)" : "rgba(30, 30, 27, 0.45)",
+          backdropFilter: "blur(4px)",
+          WebkitBackdropFilter: "blur(4px)",
+          transition: "opacity 0.25s ease",
         }}
         onClick={onClose}
       />
 
       {/* Slide-over Drawer Panel */}
-      <div
+      <aside
+        role="dialog"
+        aria-modal="true"
+        aria-label="Navigation Menu"
         style={{
           position: "relative",
           width: "100%",
-          maxWidth: "400px",
+          maxWidth: "320px",
           height: "100%",
-          backgroundColor: "#ffffff",
-          boxShadow: "-6px 0 32px rgba(15,23,42,0.2)",
+          backgroundColor: isDark ? "var(--clr-white)" : "#FFFFFF",
+          boxShadow: "var(--shadow-drawer)",
           display: "flex",
           flexDirection: "column",
           zIndex: 10000,
-          borderLeft: "1px solid #E2E8F0",
+          borderLeft: isDark ? "1px solid var(--clr-primary-300)" : "1.5px solid var(--clr-primary-200)",
+          color: isDark ? "#F8FAFC" : "var(--clr-gray-900)",
         }}
       >
         {/* Drawer Header */}
         <div
           style={{
-            padding: "16px 20px",
-            borderBottom: "1px solid #E2E8F0",
+            padding: "16px 18px",
+            borderBottom: isDark ? "1px solid var(--clr-primary-300)" : "1px solid var(--clr-primary-200)",
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            backgroundColor: "#F8FAFC",
+            backgroundColor: isDark ? "var(--clr-gray-100)" : "var(--clr-primary-50)",
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-            <Image
-              src="/logo.png"
-              alt="Minutes Ahead Logo"
-              width={38}
-              height={38}
-              style={{ borderRadius: "50%", border: "1.5px solid #C8E6C9" }}
-            />
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <div
+              style={{
+                width: "36px",
+                height: "36px",
+                borderRadius: "50%",
+                border: "none",
+                backgroundColor: "#FFFFFF",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                overflow: "hidden",
+                flexShrink: 0,
+                boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
+              }}
+            >
+              <img
+                src="logo.png"
+                alt="Minutes Ahead Logo"
+                width={36}
+                height={36}
+                style={{ width: "100%", height: "100%", objectFit: "contain", borderRadius: "50%", clipPath: "circle(49% at 50% 50%)" }}
+                onError={(e) => {
+                  const target = e.currentTarget;
+                  if (!target.src.includes("/logo.png")) {
+                    target.src = "/logo.png";
+                  }
+                }}
+              />
+            </div>
             <div>
-              <div style={{ fontWeight: 800, color: "#1B5E20", fontSize: "16px" }}>
+              <div style={{ fontWeight: 800, fontSize: "14.5px", letterSpacing: "-0.01em", color: isDark ? "var(--clr-primary-900)" : "var(--clr-primary-900)" }}>
                 Minutes Ahead
               </div>
-              <div style={{ fontSize: "11px", color: "#64748B", fontWeight: 500 }}>
-                {lang === "hi" ? "मेन्यू एवं संसाधन पोर्टल" : "Menu & Meteorological Resources"}
+              <div style={{ fontSize: "10px", color: isDark ? "var(--clr-gray-500)" : "var(--clr-gray-600)", fontWeight: 500 }}>
+                {lang === "hi" ? "मौसम चेतावनी पोर्टल" : "Public Safety Nowcasting"}
               </div>
             </div>
           </div>
+
           <button
             onClick={onClose}
+            aria-label="Close menu"
             style={{
               width: "32px",
               height: "32px",
-              borderRadius: "50%",
-              backgroundColor: "#ffffff",
-              border: "1px solid #CBD5E1",
-              color: "#64748B",
+              borderRadius: "var(--radius-md)",
+              backgroundColor: isDark ? "var(--clr-gray-200)" : "#FFFFFF",
+              border: isDark ? "1px solid var(--clr-primary-300)" : "1px solid var(--clr-primary-200)",
+              color: isDark ? "var(--clr-gray-600)" : "var(--clr-gray-700)",
               fontSize: "14px",
               fontWeight: "bold",
               cursor: "pointer",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
+              transition: "all var(--duration-fast)",
             }}
           >
             ✕
           </button>
         </div>
 
-        {/* Drawer Body (Scrollable) */}
-        <div style={{ flex: 1, overflowY: "auto", padding: "20px", display: "flex", flexDirection: "column", gap: "18px" }}>
-          {/* 1. Language Selection (Hindi / English ONLY) */}
+        {/* Drawer Body — Clean List of 6 Items */}
+        <div
+          style={{
+            flex: 1,
+            overflowY: "auto",
+            padding: "16px 14px",
+            display: "flex",
+            flexDirection: "column",
+            gap: "8px",
+          }}
+        >
           <div
             style={{
-              padding: "14px",
-              backgroundColor: "#EDF7EE",
-              border: "1.5px solid #C8E6C9",
-              borderRadius: "10px",
+              fontSize: "10.5px",
+              fontWeight: 800,
+              color: "var(--clr-gray-500)",
+              textTransform: "uppercase",
+              letterSpacing: "0.08em",
+              padding: "2px 8px 4px 8px",
             }}
           >
-            <div
-              style={{
-                fontSize: "11px",
-                fontWeight: 700,
-                color: "#1B5E20",
-                textTransform: "uppercase",
-                marginBottom: "8px",
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
-            >
-              <span>🌐 {lang === "hi" ? "भाषा का चयन (Language)" : "Language Selection"}</span>
-              <span
-                style={{
-                  fontSize: "10px",
-                  padding: "1px 6px",
-                  backgroundColor: "#ffffff",
-                  color: "#2E7D32",
-                  borderRadius: "4px",
-                  border: "1px solid #C8E6C9",
-                }}
-              >
-                {lang === "hi" ? "हिन्दी" : "English"}
-              </span>
-            </div>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px" }}>
-              <button
-                onClick={() => onLangChange("en")}
-                style={{
-                  padding: "8px",
-                  borderRadius: "6px",
-                  fontSize: "12px",
-                  fontWeight: 700,
-                  cursor: "pointer",
-                  border: lang === "en" ? "1.5px solid #2E7D32" : "1px solid #CBD5E1",
-                  backgroundColor: lang === "en" ? "#2E7D32" : "#ffffff",
-                  color: lang === "en" ? "#ffffff" : "#475569",
-                  transition: "all 0.15s ease",
-                }}
-              >
-                English
-              </button>
-              <button
-                onClick={() => onLangChange("hi")}
-                style={{
-                  padding: "8px",
-                  borderRadius: "6px",
-                  fontSize: "12px",
-                  fontWeight: 700,
-                  cursor: "pointer",
-                  border: lang === "hi" ? "1.5px solid #2E7D32" : "1px solid #CBD5E1",
-                  backgroundColor: lang === "hi" ? "#2E7D32" : "#ffffff",
-                  color: lang === "hi" ? "#ffffff" : "#475569",
-                  transition: "all 0.15s ease",
-                }}
-              >
-                हिन्दी (Hindi)
-              </button>
-            </div>
+            {lang === "hi" ? "मेन्यू सेवाएं" : "Portal Services"}
           </div>
 
-          {/* 2. Page Navigation Links */}
-          <div>
-            <div style={{ fontSize: "11px", fontWeight: 700, color: "#64748B", textTransform: "uppercase", marginBottom: "8px", letterSpacing: "0.05em" }}>
-              {lang === "hi" ? "पोर्टल अनुभाग" : "Navigation Links"}
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
-              {[
-                { id: "home", label: lang === "hi" ? "मुख्य पृष्ठ (Home)" : "Home Portal", icon: "🏠" },
-                { id: "dashboard", label: lang === "hi" ? "मैप डैशबोर्ड (Map Dashboard)" : "Live Map Dashboard", icon: "🗺️" },
-                { id: "about", label: lang === "hi" ? "हमारे बारे में (About Mission)" : "About Project & Mission", icon: "ℹ️" },
-              ].map((item) => (
-                <button
-                  key={item.id}
-                  onClick={() => {
-                    onTabChange(item.id as any);
-                    onClose();
-                  }}
+          {menuItems.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => {
+                onNavigateItem(item.id);
+                onClose();
+              }}
+              style={{
+                width: "100%",
+                padding: "11px 12px",
+                borderRadius: "var(--radius-md)",
+                textAlign: "left",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                cursor: "pointer",
+                border: isDark ? "1px solid var(--clr-primary-200)" : "1px solid var(--clr-gray-200)",
+                backgroundColor: isDark ? "var(--clr-gray-100)" : "#FFFFFF",
+                color: isDark ? "var(--clr-gray-800)" : "var(--clr-gray-800)",
+                transition: "all var(--duration-fast) var(--ease-out)",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = isDark ? "var(--clr-primary-100)" : "var(--clr-primary-50)";
+                e.currentTarget.style.borderColor = "var(--clr-primary-400)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = isDark ? "var(--clr-gray-100)" : "#FFFFFF";
+                e.currentTarget.style.borderColor = isDark ? "var(--clr-primary-200)" : "var(--clr-gray-200)";
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                <div
                   style={{
-                    width: "100%",
-                    padding: "12px 14px",
-                    borderRadius: "8px",
-                    fontSize: "13px",
-                    fontWeight: 700,
-                    textAlign: "left",
+                    width: "32px",
+                    height: "32px",
+                    borderRadius: "var(--radius-sm)",
+                    backgroundColor: "var(--clr-primary-100)",
+                    color: "var(--clr-primary-800)",
                     display: "flex",
                     alignItems: "center",
-                    justifyContent: "space-between",
-                    cursor: "pointer",
-                    border: currentTab === item.id ? "1.5px solid #2E7D32" : "1px solid #E2E8F0",
-                    backgroundColor: currentTab === item.id ? "#2E7D32" : "#ffffff",
-                    color: currentTab === item.id ? "#ffffff" : "#0F172A",
-                    transition: "all 0.15s ease",
+                    justifyContent: "center",
+                    flexShrink: 0,
+                    border: "1px solid var(--clr-primary-200)",
                   }}
                 >
-                  <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                    <span>{item.icon}</span>
-                    <span>{item.label}</span>
-                  </div>
-                  <span>→</span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* 3. Audio Alarm Toggle */}
-          <div
-            style={{
-              padding: "12px 14px",
-              backgroundColor: "#ffffff",
-              border: "1px solid #E2E8F0",
-              borderRadius: "8px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
-          >
-            <div>
-              <div style={{ fontSize: "12px", fontWeight: 700, color: "#0F172A" }}>
-                {lang === "hi" ? "वज्रपात चेतावनी ध्वनि" : "Lightning Audio Alert"}
-              </div>
-              <div style={{ fontSize: "11px", color: "#64748B" }}>
-                {muted
-                  ? lang === "hi" ? "अलर्ट म्यूट है" : "Alert chime is muted"
-                  : lang === "hi" ? "ध्वनि सक्रिय है" : "Sound is active on strikes"}
-              </div>
-            </div>
-            <button
-              onClick={onMuteToggle}
-              style={{
-                padding: "6px 12px",
-                borderRadius: "6px",
-                fontSize: "12px",
-                fontWeight: 700,
-                cursor: "pointer",
-                border: muted ? "1px solid #CBD5E1" : "1.5px solid #C8E6C9",
-                backgroundColor: muted ? "#F1F5F9" : "#EDF7EE",
-                color: muted ? "#64748B" : "#1B5E20",
-              }}
-            >
-              {muted ? "🔇 Unmute" : "🔔 Mute"}
-            </button>
-          </div>
-
-          {/* 4. IMD Doppler Radar Network Quick Summary */}
-          <div>
-            <div style={{ fontSize: "11px", fontWeight: 700, color: "#64748B", textTransform: "uppercase", marginBottom: "8px", display: "flex", justifyContent: "space-between" }}>
-              <span>📡 {lang === "hi" ? "IMD डॉपलर रडार नेटवर्क" : "IMD Radar Network"}</span>
-              <span style={{ color: "#15803D", fontWeight: 700 }}>17 Active</span>
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: "6px", maxHeight: "160px", overflowY: "auto" }}>
-              {IMD_DWR_NETWORK.slice(0, 8).map((dwr) => (
-                <div
-                  key={dwr.name}
-                  style={{
-                    padding: "8px 10px",
-                    borderRadius: "6px",
-                    backgroundColor: "#F8FAFC",
-                    border: "1px solid #E2E8F0",
-                    fontSize: "11px",
-                    display: "flex",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <span style={{ fontWeight: 600, color: "#0F172A" }}>{dwr.name}</span>
-                  <span style={{ color: "#64748B", fontFamily: "monospace" }}>{dwr.band} · {dwr.rangeKm}km</span>
+                  {item.icon}
                 </div>
-              ))}
-            </div>
+                <span style={{ fontSize: "13.5px", fontWeight: 600 }}>
+                  {lang === "hi" ? item.labelHi : item.label}
+                </span>
+              </div>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--clr-primary-600)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
+            </button>
+          ))}
+        </div>
+
+        {/* Drawer Footer with Theme Toggle (Accessible in Settings, Not prominent in main navbar) */}
+        <div
+          style={{
+            padding: "14px 18px",
+            borderTop: isDark ? "1px solid var(--clr-primary-300)" : "1px solid var(--clr-gray-200)",
+            backgroundColor: isDark ? "var(--clr-gray-100)" : "var(--clr-gray-50)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <div style={{ fontSize: "12px", fontWeight: 600, color: "var(--clr-gray-600)" }}>
+            {lang === "hi" ? "थीम मोड" : "Theme Preference"}
           </div>
 
-          {/* 5. Emergency Helplines */}
-          <div
+          <button
+            onClick={onToggleTheme}
             style={{
-              padding: "14px",
-              backgroundColor: "#FFF1F2",
-              border: "1px solid #FECDD3",
-              borderRadius: "10px",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "6px",
+              padding: "5px 12px",
+              borderRadius: "var(--radius-full)",
+              backgroundColor: isDark ? "var(--clr-primary-100)" : "#FFFFFF",
+              border: "1.5px solid var(--clr-primary-200)",
+              color: isDark ? "var(--clr-primary-800)" : "var(--clr-primary-800)",
+              fontSize: "11.5px",
+              fontWeight: 700,
+              cursor: "pointer",
             }}
           >
-            <div style={{ fontSize: "12px", fontWeight: 700, color: "#881337", marginBottom: "6px", display: "flex", alignItems: "center", gap: "6px" }}>
-              <span>🚨</span>
-              <span>{lang === "hi" ? "आपदा हेल्पलाइन" : "Disaster Helplines"}</span>
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: "4px", fontSize: "11px", color: "#9F1239" }}>
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span>NDMA Helpline:</span>
-                <strong style={{ fontFamily: "monospace", fontSize: "13px" }}>1078</strong>
-              </div>
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span>National Emergency:</span>
-                <strong style={{ fontFamily: "monospace", fontSize: "13px" }}>112</strong>
-              </div>
-            </div>
-          </div>
+            {isDark ? "🌙 Dark" : "☀️ Light"}
+          </button>
         </div>
-
-        {/* Drawer Footer */}
-        <div style={{ padding: "14px", borderTop: "1px solid #E2E8F0", backgroundColor: "#F8FAFC", textAlign: "center", fontSize: "11px", color: "#64748B" }}>
-          Minutes Ahead · Ministry of Earth Sciences / IMD
-        </div>
-      </div>
+      </aside>
     </div>
   );
 }

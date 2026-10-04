@@ -22,7 +22,7 @@ export default function SafetyRing({ selectedStorm }: SafetyRingProps) {
 
   return (
     <div className={`glass-panel p-3 transition-all ${inDanger ? "border-red-500/60 animate-pulse-glow" : ""}`}>
-      <div className="text-xs font-semibold text-slate-400 mb-2">⚡ LIGHTNING SAFETY RING</div>
+      <div className="text-xs font-semibold text-slate-400 mb-2">LIGHTNING SAFETY RING</div>
 
       {countdown > 0 ? (
         <>

@@ -18,7 +18,7 @@ export default function AIReasoningPanel({ importance }: AIReasoningPanelProps) 
   return (
     <div className="glass-panel p-3">
       <div className="text-xs font-semibold text-slate-400 mb-2 flex items-center gap-1">
-        🧠 AI REASONING
+        METEOROLOGICAL ATTENTION WEIGHTS
         <span className="ml-auto text-[10px] text-slate-600">source contributions</span>
       </div>
       <div className="flex flex-col gap-2">

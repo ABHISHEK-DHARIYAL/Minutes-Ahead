@@ -4,6 +4,7 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import type { NowcastData, StormCard } from "@/app/page";
 import { LiveWeatherData, IMD_DWR_NETWORK } from "@/data/indiaData";
+import { AI_RISK_ZONES, RiskZone } from "@/data/riskZonesData";
 
 interface StormMapProps {
   nowcast: NowcastData | null;
@@ -17,6 +18,7 @@ interface StormMapProps {
   selectedStation: LiveWeatherData | null;
   onSelectStation: (st: LiveWeatherData | null) => void;
   flyToCoord: { lat: number; lon: number } | null;
+  isActive?: boolean;
 }
 
 // ── Free basemaps: no API key, no billing, no account ───────────────
@@ -30,17 +32,57 @@ const ESRI_LABELS_URL =
   "https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}";
 const ESRI_ATTR = "Tiles &copy; Esri &mdash; Source: Esri, Maxar, Earthstar Geographics";
 
-const INDIA_CENTER: [number, number] = [22.2, 79.8];
-// [[south, west], [north, east]]
+// Exact geographic center and Standard Meridian of India (82.5° E)
+const INDIA_CENTER: [number, number] = [22.8, 82.5];
 const INDIA_BOUNDS: L.LatLngBoundsExpression = [
-  [6.5, 68.0],
-  [35.8, 97.5],
+  [6.8, 68.0],
+  [36.0, 97.5],
 ];
-// Keep India inside the area that is NOT covered by the left/right side panels
-const FIT_OPTIONS: L.FitBoundsOptions = {
-  paddingTopLeft: [360, 70],
-  paddingBottomRight: [360, 110],
-};
+
+function resetToIndiaView(map: L.Map, animated = false) {
+  const isMobile = typeof window !== "undefined" && window.innerWidth <= 768;
+  const targetCenter: [number, number] = isMobile ? [22.2, 82.0] : [22.8, 82.5];
+  const targetZoom = isMobile ? 4.2 : 4.85;
+
+  if (animated) {
+    map.flyTo(targetCenter, targetZoom, { duration: 0.8 });
+  } else {
+    map.setView(targetCenter, targetZoom);
+  }
+}
+
+function getDistanceKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const R = 6371;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return Math.round(R * c);
+}
+
+function findNearestRadar(lat: number, lon: number) {
+  let nearest = IMD_DWR_NETWORK[0];
+  let minDistance = Infinity;
+  for (const radar of IMD_DWR_NETWORK) {
+    const dist = getDistanceKm(lat, lon, radar.lat, radar.lon);
+    if (dist < minDistance) {
+      minDistance = dist;
+      nearest = radar;
+    }
+  }
+  return { radar: nearest, distanceKm: minDistance };
+}
+
+function getCompassDirection(deg: number): string {
+  const directions = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"];
+  const index = Math.round((deg % 360) / 22.5);
+  return directions[index % 16];
+}
 
 export default function StormMap({
   nowcast,
@@ -54,6 +96,7 @@ export default function StormMap({
   selectedStation,
   onSelectStation,
   flyToCoord,
+  isActive = true,
 }: StormMapProps) {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
@@ -63,13 +106,15 @@ export default function StormMap({
   const [mapError, setMapError] = useState<string | null>(null);
 
   // Basemap mode: 'streets' (OpenStreetMap) or 'satellite' (Esri imagery)
-  const [mapMode, setMapMode] = useState<"streets" | "satellite">("streets");
+  const [mapMode, setMapMode] = useState<"streets" | "satellite">("satellite");
 
   // One layer group per overlay type so each can be cleared independently
   const stationLayerRef = useRef<L.LayerGroup | null>(null);
   const dwrLayerRef = useRef<L.LayerGroup | null>(null);
   const stormLayerRef = useRef<L.LayerGroup | null>(null);
   const lightningLayerRef = useRef<L.LayerGroup | null>(null);
+  const riskZonesLayerRef = useRef<L.LayerGroup | null>(null);
+  const [selectedRiskZone, setSelectedRiskZone] = useState<RiskZone | null>(null);
 
   const htmlIcon = (html: string, size: [number, number], anchor: [number, number]) =>
     L.divIcon({ html, className: "", iconSize: size, iconAnchor: anchor });
@@ -79,11 +124,15 @@ export default function StormMap({
     const container = mapContainerRef.current;
     if (!container || mapRef.current) return;
 
+    const isMobile = typeof window !== "undefined" && window.innerWidth <= 768;
+    const initialZoom = isMobile ? 4.2 : 4.85;
+    const initialCenter: [number, number] = isMobile ? [22.2, 82.0] : [22.8, 82.5];
+
     let map: L.Map;
     try {
       map = L.map(container, {
-        center: INDIA_CENTER,
-        zoom: 5,
+        center: initialCenter,
+        zoom: initialZoom,
         minZoom: 4,
         maxZoom: 18,
         zoomControl: false,
@@ -103,15 +152,19 @@ export default function StormMap({
     dwrLayerRef.current = L.layerGroup().addTo(map);
     stormLayerRef.current = L.layerGroup().addTo(map);
     lightningLayerRef.current = L.layerGroup().addTo(map);
+    riskZonesLayerRef.current = L.layerGroup().addTo(map);
 
-    map.fitBounds(INDIA_BOUNDS, FIT_OPTIONS);
+    resetToIndiaView(map, false);
     mapRef.current = map;
     setMapReady(true);
 
     // Keep the map correctly sized when the window / panels change size
     const ro = new ResizeObserver(() => map.invalidateSize());
     ro.observe(container);
-    const t = setTimeout(() => map.invalidateSize(), 150);
+    const t = setTimeout(() => {
+      map.invalidateSize();
+      resetToIndiaView(map, false);
+    }, 150);
 
     return () => {
       clearTimeout(t);
@@ -122,6 +175,18 @@ export default function StormMap({
       setMapReady(false);
     };
   }, []);
+
+  // ── Default to full India view whenever Nowcast tab is active ─────
+  useEffect(() => {
+    if (isActive && mapRef.current) {
+      const map = mapRef.current;
+      const t = setTimeout(() => {
+        map.invalidateSize();
+        resetToIndiaView(map, false);
+      }, 50);
+      return () => clearTimeout(t);
+    }
+  }, [isActive, mapReady]);
 
   // ── 2. Basemap: Streets (OSM) vs Satellite (Esri) ─────────────────
   useEffect(() => {
@@ -149,7 +214,8 @@ export default function StormMap({
 
   // ── Center on India Button ────────────────────────────────────────
   const handleResetToIndia = () => {
-    mapRef.current?.fitBounds(INDIA_BOUNDS, FIT_OPTIONS);
+    if (!mapRef.current) return;
+    resetToIndiaView(mapRef.current, true);
   };
 
   const handleZoom = (delta: number) => {
@@ -187,8 +253,10 @@ export default function StormMap({
         <div style="
           width: 24px; height: 24px; background: #0284c7; border: 2px solid #ffffff;
           border-radius: 50%; display: flex; align-items: center; justify-content: center;
-          font-size: 11px; color: #ffffff; box-shadow: 0 2px 8px rgba(0,0,0,0.25);
-        " title="${dwr.name} (${dwr.band}) - ${dwr.rangeKm}km">📡</div>
+          color: #ffffff; box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+        " title="${dwr.name} (${dwr.band}) - ${dwr.rangeKm}km">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="3" x2="12" y2="6"/></svg>
+        </div>
       `;
 
       const popup = `
@@ -227,16 +295,29 @@ export default function StormMap({
           : "#16a34a";
 
       const isSelected = selectedStation?.stationId === st.stationId;
+      const isSevere = st.riskLevel === "RED" || st.riskLevel === "ORANGE";
 
       const html = `
-        <div style="
-          display: inline-flex; align-items: center; gap: 4px; background: #ffffff;
-          border: 1.5px solid ${isSelected ? "#2e7d32" : "#cbd5e1"};
-          padding: 2px 7px; border-radius: 14px; box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-          font-family: system-ui, -apple-system, sans-serif; white-space: nowrap;
-        ">
-          <span style="width: 7px; height: 7px; border-radius: 50%; background: ${riskBg}; display: inline-block;"></span>
-          <span style="font-size: 11px; font-weight: 700; color: #0f172a;">${st.temp}°C</span>
+        <div style="position: relative; display: inline-flex; align-items: center; justify-content: center;">
+          ${
+            isSevere
+              ? `<span style="
+                  position: absolute; inset: -4px; border-radius: 14px;
+                  border: 2px solid ${riskBg}; opacity: 0.75;
+                  animation: pulse 1.8s infinite; pointer-events: none;
+                "></span>`
+              : ""
+          }
+          <div style="
+            display: inline-flex; align-items: center; gap: 4px; background: #ffffff;
+            border: 1.5px solid ${isSelected ? "#0284c7" : isSevere ? riskBg : "#cbd5e1"};
+            padding: 2px 7px; border-radius: 14px; box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+            font-family: system-ui, -apple-system, sans-serif; white-space: nowrap;
+            ${isSelected ? "transform: scale(1.1); box-shadow: 0 0 0 3px rgba(2,132,199,0.35);" : ""}
+          ">
+            <span style="width: 7px; height: 7px; border-radius: 50%; background: ${riskBg}; display: inline-block;"></span>
+            <span style="font-size: 11px; font-weight: 700; color: #0f172a;">${st.temp}°C</span>
+          </div>
         </div>
       `;
 
@@ -259,6 +340,7 @@ export default function StormMap({
 
     nowcast.storm_cards.forEach((storm) => {
       const isSelected = selectedStorm?.id === storm.id;
+      const isExtreme = storm.severity === "EXTREME";
       const color =
         storm.severity === "EXTREME"
           ? "#dc2626"
@@ -267,21 +349,30 @@ export default function StormMap({
           : "#ca8a04";
 
       const html = `
-        <div style="display: flex; flex-direction: column; align-items: center;">
+        <div style="display: flex; flex-direction: column; align-items: center; position: relative;">
+          ${
+            isExtreme
+              ? `<div style="
+                  position: absolute; top: -3px; width: 68px; height: 26px; border-radius: 8px;
+                  border: 2px solid #dc2626; opacity: 0.8;
+                  animation: pulse 1.4s infinite; pointer-events: none;
+                "></div>`
+              : ""
+          }
           <div style="
-            background: ${color}; color: #ffffff; font-size: 11px; font-weight: 700;
+            background: ${color}; color: #ffffff; font-size: 11px; font-weight: 800;
             padding: 3px 8px; border-radius: 6px; border: 1.5px solid #ffffff;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.25); display: flex; align-items: center; gap: 4px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 4px;
             font-family: system-ui, sans-serif; white-space: nowrap;
-            ${isSelected ? "transform: scale(1.15);" : ""}
+            ${isSelected ? "transform: scale(1.15); box-shadow: 0 0 0 3px rgba(2,132,199,0.5);" : ""}
           ">
-            <span>⚡</span>
+            <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
             <span>${storm.max_reflectivity.toFixed(0)} dBZ</span>
           </div>
           <div style="
-            font-size: 10px; font-weight: 600; color: #0f172a; background: #ffffff;
-            border: 1px solid #cbd5e1; padding: 1px 5px; border-radius: 4px; margin-top: 3px;
-            box-shadow: 0 1px 4px rgba(0,0,0,0.1); white-space: nowrap; font-family: system-ui, sans-serif;
+            font-size: 10px; font-weight: 700; color: #0f172a; background: #ffffff;
+            border: 1px solid #cbd5e1; padding: 1px 6px; border-radius: 4px; margin-top: 3px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.12); white-space: nowrap; font-family: system-ui, sans-serif;
           ">${storm.nearest_district ?? storm.id}</div>
         </div>
       `;
@@ -312,6 +403,110 @@ export default function StormMap({
     });
   }, [mapReady, lightning, activeLayers.lightning]);
 
+  // ── Render AI Thunderstorm Risk Layer (Geographic Zones) ──────────
+  useEffect(() => {
+    const group = riskZonesLayerRef.current;
+    if (!mapReady || !group) return;
+
+    group.clearLayers();
+    if (!activeLayers.riskZones) return;
+
+    AI_RISK_ZONES.forEach((zone) => {
+      const color =
+        zone.riskLevel === "Severe"
+          ? "#dc2626"
+          : zone.riskLevel === "High"
+          ? "#ea580c"
+          : zone.riskLevel === "Moderate"
+          ? "#ca8a04"
+          : "#16a34a";
+
+      const poly = L.polygon(zone.polygon, {
+        color: color,
+        weight: 2,
+        fillColor: color,
+        fillOpacity: mapMode === "satellite" ? 0.28 : 0.22,
+        dashArray: zone.riskLevel === "Severe" ? undefined : "5, 5",
+      });
+
+      poly.on("click", (e) => {
+        L.DomEvent.stopPropagation(e);
+        setSelectedRiskZone(zone);
+        mapRef.current?.flyTo(zone.center, 7, { duration: 1.0 });
+      });
+
+      poly.addTo(group);
+
+      // Centered zone badge
+      const badgeHtml = `
+        <div style="
+          background: ${color}; color: #ffffff; font-size: 10px; font-weight: 800;
+          padding: 2px 8px; border-radius: 9999px; border: 1.5px solid #ffffff;
+          box-shadow: 0 2px 6px rgba(0,0,0,0.35); text-transform: uppercase;
+          white-space: nowrap; cursor: pointer; letter-spacing: 0.03em;
+          display: inline-flex; align-items: center; gap: 4px;
+        ">
+          <span style="width: 5px; height: 5px; border-radius: 50%; background: #ffffff;"></span>
+          <span>${zone.riskLevel} Risk</span>
+        </div>
+      `;
+
+      const marker = L.marker(zone.center, {
+        icon: htmlIcon(badgeHtml, [90, 20], [45, 10]),
+      });
+      marker.on("click", (e) => {
+        L.DomEvent.stopPropagation(e);
+        setSelectedRiskZone(zone);
+        mapRef.current?.flyTo(zone.center, 7, { duration: 1.0 });
+      });
+      marker.addTo(group);
+    });
+  }, [mapReady, activeLayers.riskZones, mapMode]);
+
+  // ── Map Click to Query AI Risk at Any Location ────────────────────
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!mapReady || !map) return;
+
+    const handleMapClick = (e: L.LeafletMouseEvent) => {
+      // Find closest zone
+      let closest = AI_RISK_ZONES[0];
+      let minDist = Infinity;
+      AI_RISK_ZONES.forEach((z) => {
+        const d = getDistanceKm(e.latlng.lat, e.latlng.lng, z.center[0], z.center[1]);
+        if (d < minDist) {
+          minDist = d;
+          closest = z;
+        }
+      });
+
+      if (minDist <= 160) {
+        setSelectedRiskZone(closest);
+      } else {
+        const synthesizedZone: RiskZone = {
+          id: `QUERY-${Math.round(e.latlng.lat)}-${Math.round(e.latlng.lng)}`,
+          name: `Point Query (${e.latlng.lat.toFixed(1)}°N, ${e.latlng.lng.toFixed(1)}°E)`,
+          location: `Selected Geographic Sector (${e.latlng.lat.toFixed(2)}°N, ${e.latlng.lng.toFixed(2)}°E)`,
+          region: "Indian Subcontinent",
+          riskLevel: "Low",
+          thunderstormProb: 24,
+          lightningProb: 16,
+          expectedArrivalMin: 90,
+          stormDirection: "Variable (Westerly)",
+          center: [e.latlng.lat, e.latlng.lng],
+          polygon: [],
+          primaryThreats: ["Fair Weather / Isolated Cloudiness"],
+        };
+        setSelectedRiskZone(synthesizedZone);
+      }
+    };
+
+    map.on("click", handleMapClick);
+    return () => {
+      map.off("click", handleMapClick);
+    };
+  }, [mapReady]);
+
   // NOTE: this project does not compile Tailwind utilities (globals.css is plain CSS),
   // so all layout below uses inline styles + the existing .esam-card class.
   const btnBase: React.CSSProperties = {
@@ -328,14 +523,15 @@ export default function StormMap({
   };
   const pill = (active: boolean): React.CSSProperties => ({
     ...btnBase,
-    background: active ? "#2e7d32" : "transparent",
-    color: active ? "#ffffff" : "#475569",
+    background: active ? "var(--clr-primary-800, #2E7D32)" : "transparent",
+    color: active ? "#ffffff" : "var(--clr-gray-900, #1E1E1B)",
+    fontWeight: active ? 700 : 600,
   });
   const floatBox: React.CSSProperties = {
     background: "#ffffff",
-    border: "1px solid #cbd5e1",
+    border: "1px solid var(--clr-primary-200, #C8E6C9)",
     borderRadius: 8,
-    boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+    boxShadow: "var(--shadow-card, 0 2px 8px rgba(0,0,0,0.08))",
   };
   const tile: React.CSSProperties = {
     background: "#f8fafc",
@@ -343,9 +539,9 @@ export default function StormMap({
     borderRadius: 8,
     padding: 10,
   };
-  const tileLabel: React.CSSProperties = { fontSize: 10, color: "#64748b", fontWeight: 500, display: "block" };
-  const tileValue: React.CSSProperties = { fontSize: 16, fontWeight: 700, color: "#0f172a", display: "block" };
-  const tileSub: React.CSSProperties = { fontSize: 10, color: "#64748b", display: "block" };
+  const tileLabel: React.CSSProperties = { fontSize: 10, color: "var(--clr-gray-500, #737370)", fontWeight: 500, display: "block" };
+  const tileValue: React.CSSProperties = { fontSize: 16, fontWeight: 700, color: "var(--clr-gray-900, #1E1E1B)", display: "block" };
+  const tileSub: React.CSSProperties = { fontSize: 10, color: "var(--clr-gray-500, #737370)", display: "block" };
 
   return (
     <div style={{ position: "absolute", inset: 0, background: "#f8fafc", overflow: "hidden" }}>
@@ -369,106 +565,367 @@ export default function StormMap({
       <div style={{ position: "absolute", top: 14, left: "50%", transform: "translateX(-50%)", zIndex: 10, display: "flex", alignItems: "center", gap: 8 }}>
         <div style={{ ...floatBox, padding: 2, display: "flex", alignItems: "center" }}>
           <button onClick={() => handleToggleBasemap("streets")} style={pill(mapMode === "streets")}>
-            <span>🗺️</span><span>Map</span>
+            <span>Map</span>
           </button>
           <button onClick={() => handleToggleBasemap("satellite")} style={pill(mapMode === "satellite")}>
-            <span>🛰️</span><span>Satellite</span>
+            <span>Satellite</span>
           </button>
         </div>
-        <button onClick={handleResetToIndia} title="Reset view to India" style={{ ...floatBox, ...btnBase, color: "#0f172a", padding: "8px 12px" }}>
-          <span>🎯</span><span>India View</span>
+        <button onClick={handleResetToIndia} title="Reset view to India" style={{ ...floatBox, ...btnBase, color: "var(--clr-gray-900, #1E1E1B)", padding: "8px 14px" }}>
+          <span>India View</span>
         </button>
         <div style={{ ...floatBox, display: "flex", overflow: "hidden" }}>
-          <button onClick={() => handleZoom(1)} title="Zoom in" style={{ ...btnBase, borderRadius: 0, color: "#0f172a", fontSize: 16, padding: "4px 12px", background: "transparent" }}>+</button>
-          <button onClick={() => handleZoom(-1)} title="Zoom out" style={{ ...btnBase, borderRadius: 0, color: "#0f172a", fontSize: 16, padding: "4px 12px", background: "transparent", borderLeft: "1px solid #e2e8f0" }}>−</button>
+          <button onClick={() => handleZoom(1)} title="Zoom in" style={{ ...btnBase, borderRadius: 0, color: "var(--clr-gray-900, #1E1E1B)", fontSize: 16, padding: "4px 12px", background: "transparent" }}>+</button>
+          <button onClick={() => handleZoom(-1)} title="Zoom out" style={{ ...btnBase, borderRadius: 0, color: "var(--clr-gray-900, #1E1E1B)", fontSize: 16, padding: "4px 12px", background: "transparent", borderLeft: "1px solid var(--clr-primary-200, #C8E6C9)" }}>−</button>
         </div>
       </div>
 
       {/* Selected station card (placed to the right of the left panel) */}
-      {selectedStation && (
-        <div className="esam-card" style={{ position: "absolute", top: 60, left: 348, zIndex: 10, width: 300, padding: 14 }}>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-            <div>
-              <div style={{ fontSize: 14, fontWeight: 700, color: "#0f172a" }}>{selectedStation.name}</div>
-              <div style={{ fontSize: 12, color: "#64748b" }}>
-                {selectedStation.state} · {selectedStation.lat.toFixed(2)}°N, {selectedStation.lon.toFixed(2)}°E
+      {selectedStation && (() => {
+        const nearestRadar = findNearestRadar(selectedStation.lat, selectedStation.lon);
+        return (
+          <div className="esam-card station-inspector-card" style={{ zIndex: 10, padding: 14, boxShadow: "var(--shadow-elevated, 0 8px 30px rgba(0,0,0,0.15))", border: "1px solid var(--clr-primary-200, #C8E6C9)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+              <div>
+                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                  <span style={{ fontSize: 13, fontWeight: 800, color: "var(--clr-primary-900, #1B5E20)" }}>{selectedStation.name}</span>
+                </div>
+                <div style={{ fontSize: 11, color: "var(--clr-gray-500, #737370)" }}>
+                  {selectedStation.state} · {selectedStation.lat.toFixed(2)}°N, {selectedStation.lon.toFixed(2)}°E
+                </div>
+              </div>
+              <button
+                onClick={() => onSelectStation(null)}
+                style={{ border: "none", background: "transparent", cursor: "pointer", color: "var(--clr-gray-400, #9E9E98)", fontWeight: 700, fontSize: 14, padding: "2px 4px" }}
+                title="Close"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Nearest Radar info */}
+            <div style={{ marginTop: 8, padding: "5px 8px", background: "var(--clr-primary-50, #EDF7EE)", borderRadius: 6, border: "1px solid var(--clr-primary-200, #C8E6C9)", fontSize: 10, color: "var(--clr-primary-900, #1B5E20)", display: "flex", justifyContent: "space-between" }}>
+              <span>📡 <strong>{nearestRadar.radar.name}</strong> ({nearestRadar.radar.band})</span>
+              <span style={{ fontWeight: 700, color: "var(--clr-primary-800, #2E7D32)" }}>{nearestRadar.distanceKm} km</span>
+            </div>
+
+            <div style={{ marginTop: 8, paddingTop: 8, borderTop: "1px solid #e2e8f0", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+              <div style={tile}>
+                <span style={tileLabel}>TEMPERATURE</span>
+                <span style={tileValue}>{selectedStation.temp}°C</span>
+                <span style={tileSub}>Humidity {selectedStation.humidity}%</span>
+              </div>
+              <div style={tile}>
+                <span style={tileLabel}>INSTABILITY (CAPE)</span>
+                <span style={{ ...tileValue, color: selectedStation.cape >= 1500 ? "#e11d48" : selectedStation.cape >= 800 ? "#d97706" : "var(--clr-primary-800, #2E7D32)" }}>
+                  {selectedStation.cape} J/kg
+                </span>
+                <span style={tileSub}>LI {selectedStation.liftedIndex}°C</span>
+              </div>
+              <div style={tile}>
+                <span style={tileLabel}>SURFACE WIND</span>
+                <span style={{ ...tileValue, fontSize: 13 }}>{selectedStation.windSpeed} km/h</span>
+                <span style={tileSub}>Heading {selectedStation.windDirection}°</span>
+              </div>
+              <div style={tile}>
+                <span style={tileLabel}>PRECIPITATION</span>
+                <span style={{ ...tileValue, fontSize: 13, color: selectedStation.precipitation > 0 ? "var(--clr-primary-800, #2E7D32)" : "var(--clr-gray-700, #3E3E38)" }}>
+                  {selectedStation.precipitation > 0 ? `${selectedStation.precipitation} mm/h` : "Nil"}
+                </span>
+                <span style={tileSub}>Cloud {selectedStation.cloudCover}%</span>
               </div>
             </div>
-            <button onClick={() => onSelectStation(null)} style={{ border: "none", background: "transparent", cursor: "pointer", color: "#94a3b8", fontWeight: 700, fontSize: 14 }}>✕</button>
-          </div>
 
-          <div style={{ marginTop: 10, paddingTop: 10, borderTop: "1px solid #e2e8f0", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-            <div style={tile}>
-              <span style={tileLabel}>TEMPERATURE</span>
-              <span style={tileValue}>{selectedStation.temp}°C</span>
-              <span style={tileSub}>Humidity {selectedStation.humidity}%</span>
-            </div>
-            <div style={tile}>
-              <span style={tileLabel}>INSTABILITY (CAPE)</span>
-              <span style={{ ...tileValue, color: selectedStation.cape >= 1500 ? "#e11d48" : selectedStation.cape >= 800 ? "#d97706" : "#059669" }}>
-                {selectedStation.cape} J/kg
+            <div style={{ marginTop: 8, padding: "6px 8px", borderRadius: 6, background: "#f8fafc", border: "1px solid #e2e8f0", display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 11 }}>
+              <span style={{ color: "var(--clr-gray-600, #575752)", fontWeight: 600 }}>IMD Warning:</span>
+              <span
+                className={
+                  selectedStation.riskLevel === "RED" ? "badge-red"
+                  : selectedStation.riskLevel === "ORANGE" ? "badge-orange"
+                  : selectedStation.riskLevel === "YELLOW" ? "badge-yellow"
+                  : "badge-green"
+                }
+                style={{ fontWeight: 700, padding: "2px 8px", borderRadius: 4, fontSize: 11 }}
+              >
+                {selectedStation.riskLabel}
               </span>
-              <span style={tileSub}>LI {selectedStation.liftedIndex}°C</span>
             </div>
-            <div style={tile}>
-              <span style={tileLabel}>SURFACE WIND</span>
-              <span style={{ ...tileValue, fontSize: 14 }}>{selectedStation.windSpeed} km/h</span>
-              <span style={tileSub}>Direction {selectedStation.windDirection}°</span>
-            </div>
-            <div style={tile}>
-              <span style={tileLabel}>PRECIPITATION</span>
-              <span style={{ ...tileValue, fontSize: 14 }}>
-                {selectedStation.precipitation > 0 ? `${selectedStation.precipitation} mm/h` : "Nil"}
-              </span>
-              <span style={tileSub}>Cloud {selectedStation.cloudCover}%</span>
-            </div>
-          </div>
 
-          <div style={{ marginTop: 10, padding: 10, borderRadius: 8, background: "#f1f5f9", border: "1px solid #e2e8f0", display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 12 }}>
-            <span style={{ color: "#475569", fontWeight: 500 }}>IMD Warning Level:</span>
-            <span
-              className={
-                selectedStation.riskLevel === "RED" ? "badge-red"
-                : selectedStation.riskLevel === "ORANGE" ? "badge-orange"
-                : selectedStation.riskLevel === "YELLOW" ? "badge-yellow"
-                : "badge-green"
-              }
-              style={{ fontWeight: 600, padding: "2px 8px", borderRadius: 4, fontSize: 12 }}
+            <button
+              onClick={() => mapRef.current?.flyTo([selectedStation.lat, selectedStation.lon], 8, { duration: 1.0 })}
+              style={{
+                width: "100%",
+                marginTop: 8,
+                padding: "7px 10px",
+                borderRadius: 6,
+                backgroundColor: "var(--clr-primary-800, #2E7D32)",
+                color: "#ffffff",
+                border: "none",
+                fontSize: 11,
+                fontWeight: 700,
+                cursor: "pointer",
+                boxShadow: "var(--shadow-card)",
+              }}
             >
-              {selectedStation.riskLabel}
-            </span>
+              Locate Station on Map
+            </button>
           </div>
+        );
+      })()}
+
+      {/* Selected Storm Early Warning Cell Inspector (placed to the left of the right panel) */}
+      {selectedStorm && (
+        <div className="esam-card storm-inspector-card" style={{ zIndex: 10, padding: 14, boxShadow: "0 8px 30px rgba(220,38,38,0.18)", border: "1.5px solid #fca5a5" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+            <div>
+              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <span style={{ fontFamily: "monospace", fontSize: 12, fontWeight: 800, color: "#b91c1c" }}>{selectedStorm.id}</span>
+                <span
+                  style={{
+                    fontSize: 9,
+                    fontWeight: 800,
+                    padding: "2px 6px",
+                    borderRadius: 9999,
+                    backgroundColor: selectedStorm.severity === "EXTREME" ? "#dc2626" : "#ea580c",
+                    color: "#ffffff",
+                    textTransform: "uppercase",
+                  }}
+                >
+                  IMD {selectedStorm.severity}
+                </span>
+              </div>
+              <div style={{ fontSize: 13, fontWeight: 800, color: "#0f172a", marginTop: 2 }}>
+                {selectedStorm.nearest_district ?? "District Sector"}
+              </div>
+            </div>
+            <button
+              onClick={() => onStormSelect(null)}
+              style={{ border: "none", background: "transparent", cursor: "pointer", color: "#94a3b8", fontWeight: 700, fontSize: 14, padding: "2px 4px" }}
+              title="Close"
+            >
+              ✕
+            </button>
+          </div>
+
+          <div style={{ marginTop: 8, paddingTop: 8, borderTop: "1px solid #fee2e2", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+            <div style={{ ...tile, backgroundColor: "#fff5f5", borderColor: "#fecaca" }}>
+              <span style={tileLabel}>MAX REFLECTIVITY</span>
+              <span style={{ ...tileValue, color: "#dc2626" }}>{selectedStorm.max_reflectivity.toFixed(1)} dBZ</span>
+              <span style={{ ...tileSub, color: "#b91c1c", fontWeight: 600 }}>Hail Potential &gt;80%</span>
+            </div>
+            <div style={{ ...tile, backgroundColor: "#fff5f5", borderColor: "#fecaca" }}>
+              <span style={tileLabel}>ARRIVAL ETA</span>
+              <span style={{ ...tileValue, color: "#c2410c" }}>
+                {selectedStorm.eta_minutes ? `~${Math.round(selectedStorm.eta_minutes)}m` : "Imminent"}
+              </span>
+              <span style={tileSub}>{selectedStorm.speed_kmh.toFixed(0)} km/h · {getCompassDirection(selectedStorm.direction_deg)}</span>
+            </div>
+          </div>
+
+          <div style={{ marginTop: 8, padding: "6px 8px", borderRadius: 6, backgroundColor: "#fef2f2", border: "1px solid #fecaca", fontSize: 10, color: "#991b1b", lineHeight: 1.4 }}>
+            ⚡ <strong>Severe Convection Warning:</strong> Dangerous ground lightning strikes & squall winds. Seek immediate indoor masonry shelter.
+          </div>
+
+          <button
+            onClick={() => mapRef.current?.flyTo([selectedStorm.lat, selectedStorm.lon], 8, { duration: 1.0 })}
+            style={{
+              width: "100%",
+              marginTop: 8,
+              padding: "6px 10px",
+              borderRadius: 6,
+              backgroundColor: "#dc2626",
+              color: "#ffffff",
+              border: "none",
+              fontSize: 11,
+              fontWeight: 700,
+              cursor: "pointer",
+            }}
+          >
+            Locate Storm Cell on Map
+          </button>
         </div>
       )}
 
-      {/* Legends (bottom, between the side panels, above the time scrubber) */}
-      <div style={{ position: "absolute", bottom: 84, left: 348, zIndex: 10, display: "flex", gap: 8 }}>
-        <div className="esam-card" style={{ padding: "8px 14px", fontSize: 12 }}>
-          <div style={{ fontSize: 10, fontWeight: 700, color: "#475569", marginBottom: 6, textTransform: "uppercase" }}>
-            Radar Reflectivity (dBZ)
+      {/* ── Compact Information Panel for AI Thunderstorm Risk Layer ── */}
+      {selectedRiskZone && (
+        <div
+          className="esam-card"
+          style={{
+            position: "absolute",
+            top: 60,
+            left: "50%",
+            transform: "translateX(-50%)",
+            zIndex: 100,
+            width: 320,
+            padding: "14px 16px",
+            backgroundColor: "rgba(255, 255, 255, 0.98)",
+            backdropFilter: "blur(14px)",
+            WebkitBackdropFilter: "blur(14px)",
+            border: `1.5px solid ${
+              selectedRiskZone.riskLevel === "Severe"
+                ? "#dc2626"
+                : selectedRiskZone.riskLevel === "High"
+                ? "#ea580c"
+                : selectedRiskZone.riskLevel === "Moderate"
+                ? "#ca8a04"
+                : "#16a34a"
+            }`,
+            boxShadow: "0 10px 32px rgba(9, 13, 22, 0.22)",
+            borderRadius: 12,
+          }}
+        >
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 8 }}>
+            <div>
+              <div style={{ fontSize: 10, fontWeight: 800, color: "#64748b", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+                AI Thunderstorm Risk Layer
+              </div>
+              <div style={{ fontSize: 13, fontWeight: 800, color: "#0f172a", marginTop: 2 }}>
+                Location: {selectedRiskZone.location}
+              </div>
+            </div>
+            <button
+              onClick={() => setSelectedRiskZone(null)}
+              style={{ border: "none", background: "transparent", cursor: "pointer", color: "#64748b", fontWeight: 700, fontSize: 14, padding: "2px 4px" }}
+              title="Close"
+            >
+              ✕
+            </button>
           </div>
-          <div style={{ display: "flex", height: 10, width: 176, borderRadius: 4, overflow: "hidden", border: "1px solid #cbd5e1" }}>
+
+          <div style={{ display: "flex", flexDirection: "column", gap: 6, fontSize: 11, borderTop: "1px solid #e2e8f0", paddingTop: 8 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <span style={{ color: "#475569", fontWeight: 500 }}>Thunderstorm Probability:</span>
+              <strong style={{ color: selectedRiskZone.thunderstormProb >= 75 ? "#dc2626" : selectedRiskZone.thunderstormProb >= 50 ? "#ea580c" : "#16a34a", fontSize: 13 }}>
+                {selectedRiskZone.thunderstormProb}%
+              </strong>
+            </div>
+
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <span style={{ color: "#475569", fontWeight: 500 }}>Lightning Probability:</span>
+              <strong style={{ color: selectedRiskZone.lightningProb >= 65 ? "#dc2626" : selectedRiskZone.lightningProb >= 40 ? "#d97706" : "#16a34a", fontSize: 13 }}>
+                {selectedRiskZone.lightningProb}%
+              </strong>
+            </div>
+
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <span style={{ color: "#475569", fontWeight: 500 }}>Risk Level:</span>
+              <span
+                style={{
+                  padding: "2px 8px",
+                  borderRadius: 4,
+                  fontSize: 11,
+                  fontWeight: 800,
+                  backgroundColor:
+                    selectedRiskZone.riskLevel === "Severe"
+                      ? "#fee2e2"
+                      : selectedRiskZone.riskLevel === "High"
+                      ? "#ffedd5"
+                      : selectedRiskZone.riskLevel === "Moderate"
+                      ? "#fef9c3"
+                      : "#dcfce7",
+                  color:
+                    selectedRiskZone.riskLevel === "Severe"
+                      ? "#991b1b"
+                      : selectedRiskZone.riskLevel === "High"
+                      ? "#9a3412"
+                      : selectedRiskZone.riskLevel === "Moderate"
+                      ? "#854d0e"
+                      : "#166534",
+                }}
+              >
+                {selectedRiskZone.riskLevel}
+              </span>
+            </div>
+
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <span style={{ color: "#475569", fontWeight: 500 }}>Expected Arrival:</span>
+              <strong style={{ color: "#0f172a" }}>
+                {selectedRiskZone.expectedArrivalMin} minutes
+              </strong>
+            </div>
+
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <span style={{ color: "var(--clr-gray-600, #575752)", fontWeight: 500 }}>Storm Direction:</span>
+              <strong style={{ color: "var(--clr-primary-800, #2E7D32)" }}>
+                {selectedRiskZone.stormDirection}
+              </strong>
+            </div>
+          </div>
+
+          <div style={{ marginTop: 8, padding: "5px 8px", borderRadius: 6, backgroundColor: "#f8fafc", border: "1px solid #e2e8f0", fontSize: 10, color: "var(--clr-gray-600, #575752)" }}>
+            <strong>Primary Threats:</strong> {selectedRiskZone.primaryThreats.join(" · ")}
+          </div>
+
+          <button
+            onClick={() => mapRef.current?.flyTo(selectedRiskZone.center, 7, { duration: 1.0 })}
+            style={{
+              width: "100%",
+              marginTop: 8,
+              padding: "7px 10px",
+              borderRadius: 6,
+              backgroundColor: "var(--clr-primary-800, #2E7D32)",
+              color: "#ffffff",
+              border: "none",
+              fontSize: 11,
+              fontWeight: 700,
+              cursor: "pointer",
+              boxShadow: "var(--shadow-card)",
+            }}
+          >
+            Center on Risk Zone
+          </button>
+        </div>
+      )}
+
+      {/* Sleek Map Legends (centered above the scrubber, perfectly balanced between panels) */}
+      <div
+        className="map-legend-bar"
+        style={{
+          position: "absolute",
+          bottom: 80,
+          left: "50%",
+          transform: "translateX(-50%)",
+          zIndex: 10,
+          alignItems: "center",
+          gap: 16,
+          padding: "5px 14px",
+          backgroundColor: "rgba(255, 255, 255, 0.95)",
+          backdropFilter: "blur(12px)",
+          WebkitBackdropFilter: "blur(12px)",
+          border: "1px solid var(--clr-primary-200, #C8E6C9)",
+          borderRadius: "9999px",
+          boxShadow: "var(--shadow-card, 0 4px 16px rgba(0, 0, 0, 0.08))",
+          userSelect: "none",
+        }}
+      >
+        {/* dBZ Reflectivity */}
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <span style={{ fontSize: 10, fontWeight: 700, color: "#475569", textTransform: "uppercase" }}>
+            Reflectivity:
+          </span>
+          <div style={{ display: "flex", height: 8, width: 110, borderRadius: 3, overflow: "hidden", border: "1px solid #cbd5e1" }}>
             {["#3b82f6", "#10b981", "#eab308", "#f97316", "#ef4444", "#a855f7"].map((c) => (
               <div key={c} style={{ flex: 1, background: c }} />
             ))}
           </div>
-          <div style={{ display: "flex", justifyContent: "space-between", fontSize: 9, color: "#64748b", marginTop: 4, fontFamily: "monospace", fontWeight: 600 }}>
-            <span>15</span><span>30</span><span>45</span><span>60+</span>
-          </div>
+          <span style={{ fontSize: 9, color: "#64748b", fontFamily: "monospace", fontWeight: 700 }}>
+            15 - 65+ dBZ
+          </span>
         </div>
 
-        <div className="esam-card" style={{ padding: "8px 14px", fontSize: 12 }}>
-          <div style={{ fontSize: 10, fontWeight: 700, color: "#475569", marginBottom: 6, textTransform: "uppercase" }}>
-            IMD Alert Scale
-          </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 10, fontWeight: 600, color: "#475569" }}>
-            {[["#10b981", "Normal"], ["#f59e0b", "Watch"], ["#f97316", "Alert"], ["#e11d48", "Warning"]].map(([c, label]) => (
-              <div key={label} style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                <span style={{ width: 8, height: 8, borderRadius: "50%", background: c, display: "inline-block" }} />
-                <span>{label}</span>
-              </div>
-            ))}
-          </div>
+        <div style={{ width: 1, height: 12, backgroundColor: "#E2E8F0" }} />
+
+        {/* IMD Alert scale */}
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <span style={{ fontSize: 10, fontWeight: 700, color: "#475569", textTransform: "uppercase" }}>
+            Alerts:
+          </span>
+          {[["#10b981", "Normal"], ["#f59e0b", "Watch"], ["#f97316", "Alert"], ["#e11d48", "Warning"]].map(([c, label]) => (
+            <div key={label} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 10, fontWeight: 600, color: "#475569" }}>
+              <span style={{ width: 7, height: 7, borderRadius: "50%", background: c, display: "inline-block" }} />
+              <span>{label}</span>
+            </div>
+          ))}
         </div>
       </div>
     </div>

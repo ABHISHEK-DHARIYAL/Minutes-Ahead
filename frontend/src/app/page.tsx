@@ -8,19 +8,13 @@ import RightPanel from "@/components/RightPanel";
 import TimeScrubber from "@/components/TimeScrubber";
 import HomePageView from "@/components/HomePageView";
 import AboutPageView from "@/components/AboutPageView";
+import SafetyPageView from "@/components/SafetyPageView";
 import { LiveWeatherData } from "@/data/indiaData";
 import { fetchLiveIndiaWeather } from "@/data/weatherService";
 
 const StormMap = dynamic(() => import("@/components/StormMap"), {
   ssr: false,
-  loading: () => (
-    <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "#F8FAFC" }}>
-      <div style={{ textAlign: "center" }}>
-        <div style={{ width: "32px", height: "32px", border: "3px solid #2E7D32", borderTopColor: "transparent", borderRadius: "50%", margin: "0 auto 10px auto", animation: "spin 1s linear infinite" }} />
-        <p style={{ fontSize: "13px", fontWeight: 700, color: "#1B5E20" }}>Loading Minutes Ahead Map...</p>
-      </div>
-    </div>
-  ),
+  loading: () => null,
 });
 
 export type AppMode = "public" | "forecaster";
@@ -57,8 +51,8 @@ export interface NowcastData {
 const ML_API = process.env.NEXT_PUBLIC_ML_API_URL || "http://localhost:8001";
 
 export default function HomePage() {
-  // Navigation tabs: 'home' | 'dashboard' | 'about'
-  const [currentTab, setCurrentTab] = useState<"home" | "dashboard" | "about">("dashboard");
+  // Navigation tabs: 'home' | 'nowcast' | 'safety' | 'about' (Default to home)
+  const [currentTab, setCurrentTab] = useState<"home" | "nowcast" | "safety" | "about">("home");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   // App mode & language (English / Hindi only)
@@ -76,6 +70,7 @@ export default function HomePage() {
     satellite: true,
     lightning: true,
     radarRings: true,
+    riskZones: true,
     stateBorders: true,
   });
 
@@ -92,6 +87,155 @@ export default function HomePage() {
   const [flyToCoord, setFlyToCoord] = useState<{ lat: number; lon: number } | null>(null);
 
   const audioCtxRef = useRef<AudioContext | null>(null);
+
+  // Theme State (Light vs Dark Mode)
+  const [theme, setTheme] = useState<"light" | "dark">("light");
+
+  // Load theme from localStorage on client mount
+  useEffect(() => {
+    try {
+      const savedTheme = localStorage.getItem("minutes_ahead_theme") as "light" | "dark" | null;
+      if (savedTheme === "dark" || savedTheme === "light") {
+        setTheme(savedTheme);
+        document.documentElement.setAttribute("data-theme", savedTheme);
+        document.documentElement.classList.toggle("dark", savedTheme === "dark");
+      } else if (typeof window !== "undefined" && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+        setTheme("dark");
+        document.documentElement.setAttribute("data-theme", "dark");
+        document.documentElement.classList.add("dark");
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  const handleToggleTheme = () => {
+    setTheme((prev) => {
+      const nextTheme = prev === "light" ? "dark" : "light";
+      try {
+        localStorage.setItem("minutes_ahead_theme", nextTheme);
+        document.documentElement.setAttribute("data-theme", nextTheme);
+        document.documentElement.classList.toggle("dark", nextTheme === "dark");
+      } catch {
+        // ignore
+      }
+      return nextTheme;
+    });
+  };
+
+  // Controlled panel tabs & mobile views
+  const [leftPanelTab, setLeftPanelTab] = useState<"stations" | "atmosphere" | "sources" | "radars" | "layers">("stations");
+  const [rightPanelTab, setRightPanelTab] = useState<"warnings" | "prediction" | "storms" | "forecaster">("warnings");
+  const [leftPanelCollapsed, setLeftPanelCollapsed] = useState(false);
+  const [rightPanelCollapsed, setRightPanelCollapsed] = useState(false);
+  const [mobileActiveView, setMobileActiveView] = useState<"map" | "left" | "right">("map");
+
+  // Visual action feedback toast banner state
+  const [actionFeedback, setActionFeedback] = useState<{
+    icon: string;
+    title: string;
+    titleHi: string;
+    badge: string;
+  } | null>(null);
+
+  // Active glowing highlight on panels or scrubber
+  const [highlightTarget, setHighlightTarget] = useState<"left" | "right" | "scrubber" | "map" | null>(null);
+
+  const handleNavigateMenuItem = (target: "nowcast" | "minutes-ahead" | "stations" | "atmosphere" | "warnings" | "prediction") => {
+    handleTabChange("nowcast");
+    setIsMenuOpen(false);
+
+    // Map each menu item to a bold, prominent visual toast notification & panel highlight
+    const feedbackMap: Record<string, { icon: string; title: string; titleHi: string; badge: string; highlight: "left" | "right" | "scrubber" | "map" }> = {
+      nowcast: {
+        icon: "📡",
+        title: "Live Convective Nowcast Map",
+        titleHi: "लाइव मौसम एवं नाउकास्ट मैप",
+        badge: "MAP VIEW",
+        highlight: "map",
+      },
+      "minutes-ahead": {
+        icon: "⏱️",
+        title: "Minutes Ahead (+30m Convective Forecast)",
+        titleHi: "मिनट्स अहेड (+30 मिनट पूर्वानुमान)",
+        badge: "TIMELINE",
+        highlight: "scrubber",
+      },
+      stations: {
+        icon: "🛰️",
+        title: "Surface Observation Stations",
+        titleHi: "वेधशाला स्टेशन नेटवर्क (30+ स्टेशन)",
+        badge: "LEFT PANEL",
+        highlight: "left",
+      },
+      atmosphere: {
+        icon: "🌡️",
+        title: "Atmospheric Telemetry & Soundings",
+        titleHi: "वायुमंडलीय स्थितियां एवं स्थिरता (CAPE)",
+        badge: "LEFT PANEL",
+        highlight: "left",
+      },
+      warnings: {
+        icon: "⚡",
+        title: "Active Storm Cells & Warnings",
+        titleHi: "सक्रिय चक्रवाती तूफान एवं पूर्व-चेतावनियां",
+        badge: "RIGHT PANEL",
+        highlight: "right",
+      },
+      prediction: {
+        icon: "📊",
+        title: "AI Convective Prediction Confidence",
+        titleHi: "एआई भविष्यवाणी एवं मॉडल सटीकता",
+        badge: "RIGHT PANEL",
+        highlight: "right",
+      },
+    };
+
+    const fb = feedbackMap[target];
+    if (fb) {
+      setActionFeedback({
+        icon: fb.icon,
+        title: fb.title,
+        titleHi: fb.titleHi,
+        badge: fb.badge,
+      });
+      setHighlightTarget(fb.highlight);
+
+      setTimeout(() => {
+        setHighlightTarget(null);
+      }, 2400);
+
+      setTimeout(() => {
+        setActionFeedback(null);
+      }, 3400);
+    }
+
+    if (target === "nowcast") {
+      setSelectedLead(0);
+      setScrubOffset(0);
+      setMobileActiveView("map");
+    } else if (target === "minutes-ahead") {
+      setSelectedLead(30);
+      setScrubOffset(30);
+      setMobileActiveView("map");
+    } else if (target === "stations") {
+      setLeftPanelTab("stations");
+      setLeftPanelCollapsed(false);
+      setMobileActiveView("left");
+    } else if (target === "atmosphere") {
+      setLeftPanelTab("atmosphere");
+      setLeftPanelCollapsed(false);
+      setMobileActiveView("left");
+    } else if (target === "warnings") {
+      setRightPanelTab("warnings");
+      setRightPanelCollapsed(false);
+      setMobileActiveView("right");
+    } else if (target === "prediction") {
+      setRightPanelTab("prediction");
+      setRightPanelCollapsed(false);
+      setMobileActiveView("right");
+    }
+  };
 
   // ── Fetch Live India Weather Data ─────────────────────────────────
   const loadWeatherData = useCallback(async () => {
@@ -152,6 +296,27 @@ export default function HomePage() {
     return () => clearInterval(timer);
   }, [muted]);
 
+  // ── Smooth Tab Navigation Transition (Instant 0ms Map Switch) ──
+  const handleTabChange = (newTab: "home" | "nowcast" | "safety" | "about") => {
+    if (newTab === currentTab) return;
+    setCurrentTab(newTab);
+    if (newTab === "nowcast") {
+      setTimeout(() => {
+        window.dispatchEvent(new Event("resize"));
+      }, 30);
+    }
+  };
+
+  // Immediate map resize when switching to nowcast
+  useEffect(() => {
+    if (currentTab === "nowcast") {
+      const timer = setTimeout(() => {
+        window.dispatchEvent(new Event("resize"));
+      }, 30);
+      return () => clearTimeout(timer);
+    }
+  }, [currentTab]);
+
   const handleToggleLayer = (layerId: string) => {
     setActiveLayers((prev) => ({ ...prev, [layerId]: !prev[layerId] }));
   };
@@ -161,9 +326,10 @@ export default function HomePage() {
       {/* 2-Row Top Header */}
       <TopHeader
         currentTab={currentTab}
-        onTabChange={setCurrentTab}
+        onTabChange={handleTabChange}
         onOpenMenu={() => setIsMenuOpen(true)}
         lang={lang}
+        onLangChange={setLang}
       />
 
       {/* Hamburger Drawer Menu (Opens from right) */}
@@ -171,16 +337,79 @@ export default function HomePage() {
         isOpen={isMenuOpen}
         onClose={() => setIsMenuOpen(false)}
         lang={lang}
-        onLangChange={setLang}
-        currentTab={currentTab}
-        onTabChange={setCurrentTab}
-        muted={muted}
-        onMuteToggle={() => setMuted((m) => !m)}
+        onNavigateItem={handleNavigateMenuItem}
+        theme={theme}
+        onToggleTheme={handleToggleTheme}
       />
 
-      {/* ── VIEW 1: Map Dashboard (Full Leaflet + OpenStreetMap India Map + Left & Right Panels) ── */}
-      {currentTab === "dashboard" && (
-        <main style={{ position: "relative", flex: 1, width: "100%", overflow: "hidden" }}>
+      {/* ── Prominent Visual Action Toast / Feedback Banner ──────────── */}
+      {actionFeedback && (
+        <div
+          role="status"
+          aria-live="polite"
+          className="action-feedback-toast"
+          style={{
+            position: "fixed",
+            top: "122px",
+            left: "50%",
+            transform: "translateX(-50%)",
+            zIndex: 9999,
+            display: "flex",
+            alignItems: "center",
+            gap: "12px",
+            backgroundColor: "rgba(255, 255, 255, 0.98)",
+            backdropFilter: "blur(14px)",
+            WebkitBackdropFilter: "blur(14px)",
+            color: "var(--clr-primary-950, #0D2811)",
+            padding: "8px 20px",
+            borderRadius: "var(--radius-full)",
+            border: "2px solid var(--clr-primary-700, #388E3C)",
+            boxShadow: "0 10px 32px rgba(0, 0, 0, 0.22), 0 0 0 4px rgba(46, 125, 50, 0.2)",
+            animation: "toastSlideBounce 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
+            pointerEvents: "none",
+            userSelect: "none",
+          }}
+        >
+          <span style={{ fontSize: "22px", lineHeight: 1 }}>{actionFeedback.icon}</span>
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <span style={{ fontSize: "9.5px", fontWeight: 800, color: "var(--clr-primary-800, #2E7D32)", textTransform: "uppercase", letterSpacing: "0.06em" }}>
+              {lang === "hi" ? "✓ अनुभाग खुला" : "✓ Section Activated"}
+            </span>
+            <span style={{ fontSize: "13.5px", fontWeight: 800, color: "var(--clr-gray-900, #1E1E1B)", lineHeight: 1.2 }}>
+              {lang === "hi" ? actionFeedback.titleHi : actionFeedback.title}
+            </span>
+          </div>
+          <span
+            style={{
+              fontSize: "10px",
+              fontWeight: 800,
+              backgroundColor: "var(--clr-primary-100, #E8F5E9)",
+              color: "var(--clr-primary-800, #2E7D32)",
+              padding: "3px 9px",
+              borderRadius: "9999px",
+              letterSpacing: "0.04em",
+              border: "1px solid var(--clr-primary-300, #A5D6A7)",
+            }}
+          >
+            {actionFeedback.badge}
+          </span>
+        </div>
+      )}
+
+      {/* ── VIEW 1: Live Convective Nowcast (Always mounted so map is preloaded with 0ms transition) ── */}
+      <div
+        className="tab-transition-view"
+        style={{
+          display: currentTab === "nowcast" ? "flex" : "none",
+          flexDirection: "column",
+          flex: 1,
+          width: "100%",
+          height: "100%",
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
+        <main style={{ position: "relative", flex: 1, width: "100%", height: "100%", overflow: "hidden" }}>
           {/* Full-bleed Leaflet + OpenStreetMap India Map */}
           <div style={{ position: "absolute", inset: 0, zIndex: 0 }}>
             <StormMap
@@ -195,66 +424,131 @@ export default function HomePage() {
               selectedStation={selectedStation}
               onSelectStation={setSelectedStation}
               flyToCoord={flyToCoord}
+              isActive={currentTab === "nowcast"}
             />
           </div>
 
-          {/* Left Panel (Stations / Radars / Layers) */}
-          <div style={{ position: "absolute", top: "14px", left: "14px", bottom: "76px", zIndex: 500, pointerEvents: "auto" }}>
-            <LeftPanel
-              weatherData={weatherData}
-              onSelectStation={(st) => {
-                setSelectedStation(st);
-                setFlyToCoord({ lat: st.lat, lon: st.lon });
-              }}
-              selectedStation={selectedStation}
-              activeLayers={activeLayers}
-              onToggleLayer={handleToggleLayer}
-            />
-          </div>
+            {/* Mobile View Floating Quick-Access 2 Boxes (Only on Mobile screens <= 768px) */}
+            <div className="mobile-map-quick-boxes">
+              <button
+                id="btn-mobile-stations"
+                onClick={() => {
+                  setMobileActiveView(mobileActiveView === "left" ? "map" : "left");
+                  setLeftPanelCollapsed(false);
+                }}
+                className={`mobile-floating-pill ${mobileActiveView === "left" ? "active" : ""}`}
+                title="Observatory Stations & Atmospheric Telemetry"
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: "6px", overflow: "hidden" }}>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--clr-primary-800, #2E7D32)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
+                    <path d="M2 12h20" />
+                  </svg>
+                  <span style={{ textOverflow: "ellipsis", overflow: "hidden" }}>
+                    {lang === "hi" ? "वेधशाला स्टेशन" : "Observatory Stations"} ({weatherData.length})
+                  </span>
+                </div>
+                <span style={{ fontSize: "12px", color: "var(--clr-primary-700, #2E7D32)", fontWeight: 800, flexShrink: 0 }}>→</span>
+              </button>
 
-          {/* Right Panel (Storm Cells / Warnings / Safety Rules) */}
-          <div style={{ position: "absolute", top: "14px", right: "14px", bottom: "76px", zIndex: 500, pointerEvents: "auto" }}>
-            <RightPanel
-              nowcast={nowcast}
-              selectedStorm={selectedStorm}
-              onSelect={(s) => {
-                setSelectedStorm(s);
-                if (s) setFlyToCoord({ lat: s.lat, lon: s.lon });
-              }}
-              lang={lang}
-              appMode={appMode}
-              mlApiUrl={ML_API}
-            />
-          </div>
+              <button
+                id="btn-mobile-warnings"
+                onClick={() => {
+                  setMobileActiveView(mobileActiveView === "right" ? "map" : "right");
+                  setRightPanelCollapsed(false);
+                }}
+                className={`mobile-floating-pill ${mobileActiveView === "right" ? "active" : ""}`}
+                title="Early Warnings & Convective Storm Cells"
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: "6px", overflow: "hidden" }}>
+                  <span style={{ fontSize: "14px", flexShrink: 0 }}>⚡</span>
+                  <span style={{ textOverflow: "ellipsis", overflow: "hidden" }}>
+                    {lang === "hi" ? "पूर्व चेतावनी" : "Early Warnings"} ({nowcast?.storm_cards?.length ?? 0})
+                  </span>
+                </div>
+                <span style={{ fontSize: "12px", color: "var(--clr-primary-700, #2E7D32)", fontWeight: 800, flexShrink: 0 }}>→</span>
+              </button>
+            </div>
 
-          {/* Bottom Timeline Scrubber */}
-          <div className="bottom-scrubber-bar">
-            <TimeScrubber
-              value={scrubOffset}
-              onChange={setScrubOffset}
-              onLeadChange={setSelectedLead}
-            />
-          </div>
-        </main>
+            {/* Left Panel (Stations / Atmosphere / Radars / Layers) */}
+            <div className={`dashboard-panel-left ${mobileActiveView === "left" ? "mobile-show" : "mobile-hide"} ${highlightTarget === "left" ? "panel-action-pulse" : ""}`}>
+              <LeftPanel
+                weatherData={weatherData}
+                onSelectStation={(st) => {
+                  setSelectedStation(st);
+                  setFlyToCoord({ lat: st.lat, lon: st.lon });
+                }}
+                selectedStation={selectedStation}
+                activeLayers={activeLayers}
+                onToggleLayer={handleToggleLayer}
+                activeTabOverride={leftPanelTab}
+                isCollapsedOverride={leftPanelCollapsed}
+                onCloseMobile={() => setMobileActiveView("map")}
+              />
+            </div>
+
+            {/* Right Panel (Storm Cells / Warnings / Safety Rules) */}
+            <div className={`dashboard-panel-right ${mobileActiveView === "right" ? "mobile-show" : "mobile-hide"} ${highlightTarget === "right" ? "panel-action-pulse" : ""}`}>
+              <RightPanel
+                nowcast={nowcast}
+                selectedStorm={selectedStorm}
+                onSelect={(s) => {
+                  setSelectedStorm(s);
+                  if (s) setFlyToCoord({ lat: s.lat, lon: s.lon });
+                }}
+                lang={lang}
+                appMode={appMode}
+                mlApiUrl={ML_API}
+                activeTabOverride={rightPanelTab}
+                isCollapsedOverride={rightPanelCollapsed}
+                onCloseMobile={() => setMobileActiveView("map")}
+              />
+            </div>
+
+            {/* Bottom Timeline Scrubber */}
+            <div className={`bottom-scrubber-bar ${highlightTarget === "scrubber" ? "scrubber-action-pulse" : ""}`}>
+              <TimeScrubber
+                value={scrubOffset}
+                onChange={setScrubOffset}
+                onLeadChange={setSelectedLead}
+              />
+            </div>
+          </main>
+        </div>
+
+      {/* ── VIEW 2: Safety Portal (National Thunderstorm & Lightning Safety Protocol) ── */}
+      {currentTab === "safety" && (
+        <div key="safety" className="tab-transition-view">
+          <SafetyPageView
+            onGoToNowcast={() => handleTabChange("nowcast")}
+            lang={lang}
+          />
+        </div>
       )}
 
-      {/* ── VIEW 2: Home Page (e-Samanvit Portal Style) ─────────────── */}
+      {/* ── VIEW 3: Home Page (e-Samanvit Portal Style) ─────────────── */}
       {currentTab === "home" && (
-        <HomePageView
-          onGoToDashboard={() => setCurrentTab("dashboard")}
-          onGoToAbout={() => setCurrentTab("about")}
-          nowcast={nowcast}
-          weatherData={weatherData}
-          lang={lang}
-        />
+        <div key="home" className="tab-transition-view">
+          <HomePageView
+            onGoToDashboard={() => handleTabChange("nowcast")}
+            onGoToAbout={() => handleTabChange("about")}
+            onGoToSafety={() => handleTabChange("safety")}
+            nowcast={nowcast}
+            weatherData={weatherData}
+            lang={lang}
+          />
+        </div>
       )}
 
-      {/* ── VIEW 3: About Us Page (SIH / MoES Mission Details) ───────── */}
+      {/* ── VIEW 4: About Us Page (SIH / MoES Mission Details) ───────── */}
       {currentTab === "about" && (
-        <AboutPageView
-          onGoToDashboard={() => setCurrentTab("dashboard")}
-          lang={lang}
-        />
+        <div key="about" className="tab-transition-view">
+          <AboutPageView
+            onGoToDashboard={() => handleTabChange("nowcast")}
+            lang={lang}
+          />
+        </div>
       )}
     </div>
   );

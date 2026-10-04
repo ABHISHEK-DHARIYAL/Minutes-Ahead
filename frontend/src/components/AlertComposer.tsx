@@ -44,7 +44,7 @@ export default function AlertComposer({ storm, lang, mlApiUrl }: AlertComposerPr
 
   return (
     <div className="glass-panel p-3">
-      <div className="text-xs font-semibold text-slate-400 mb-2">📢 ALERT COMPOSER</div>
+      <div className="text-xs font-semibold text-slate-400 mb-2">ALERT COMPOSER</div>
       <div className="text-[11px] text-slate-500 mb-2">
         Lang: <span className="text-cyan-400">{LANG_LABEL[lang]}</span> · District: <span className="text-amber-400">{storm.nearest_district}</span>
       </div>
@@ -55,7 +55,7 @@ export default function AlertComposer({ storm, lang, mlApiUrl }: AlertComposerPr
         className="w-full py-1.5 rounded-lg text-xs font-semibold transition-all mb-2"
         style={{ background: "linear-gradient(135deg, rgba(124,58,237,0.4), rgba(6,182,212,0.3))", border: "1px solid rgba(124,58,237,0.5)", color: "#C4B5FD" }}
       >
-        {loading ? "Generating…" : "⚡ Generate CAP Alert"}
+        {loading ? "Generating…" : "Generate CAP Alert"}
       </button>
 
       {text && (
@@ -70,7 +70,7 @@ export default function AlertComposer({ storm, lang, mlApiUrl }: AlertComposerPr
             className="absolute top-2 right-2 text-[10px] px-2 py-0.5 rounded"
             style={{ background: "rgba(6,182,212,0.2)", color: "#67E8F9", border: "1px solid rgba(6,182,212,0.3)" }}
           >
-            {copied ? "✓ Copied" : "Copy"}
+            {copied ? "Copied" : "Copy"}
           </button>
         </div>
       )}
@@ -82,9 +82,9 @@ function getLocalAlert(storm: StormCard, lang: "en" | "hi" | "gu"): string {
   const dist = storm.nearest_district ?? "Unknown";
   const eta = storm.eta_minutes ? `${Math.round(storm.eta_minutes)} minutes` : "soon";
   const templates = {
-    en: `⚡ WARNING: Severe thunderstorm approaching ${dist} in ${eta}. Max reflectivity ${storm.max_reflectivity.toFixed(0)} dBZ. Seek shelter immediately. Avoid open areas. VajraNet AI Alert.`,
-    hi: `⚡ चेतावनी: ${dist} में ${eta} में भीषण आंधी। तुरंत आश्रय लें। खुले स्थानों से दूर रहें।`,
-    gu: `⚡ ચેતવણી: ${dist}માં ${eta}માં ભારે વાવાઝોડું. તાત્કાલિક આશ્રય લો.`,
+    en: `IMD WARNING: Severe thunderstorm approaching ${dist} in ${eta}. Max reflectivity ${storm.max_reflectivity.toFixed(0)} dBZ. Seek shelter immediately. Avoid open areas. Minutes Ahead Alert.`,
+    hi: `IMD चेतावनी: ${dist} में ${eta} में भीषण आंधी। तुरंत आश्रय लें। खुले स्थानों से दूर रहें।`,
+    gu: `IMD ચેતવણી: ${dist}માં ${eta}માં ભારે વાવાઝોડું. તાત્કાલિક આશ્રય લો.`,
   };
   return templates[lang];
 }
