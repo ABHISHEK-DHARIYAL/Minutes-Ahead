@@ -1,41 +1,50 @@
 /* ============================================================
    MINUTES AHEAD — Master Design System (Inspired by e-Samanvit)
-   Pure Vanilla CSS Architecture — 100% Explicit, Reliable & Crisp
+   e-Samanvit Visual Design Language & Government-Grade Portal Tokens
    ============================================================ */
 
 :root {
-  /* ── e-Samanvit Green & Government Navy Palette ──────────── */
+  /* ── e-Samanvit Soft Forest Green Primary ─────────────────── */
+  --clr-primary-950: #0D2811;
   --clr-primary-900: #1B5E20;
-  --clr-primary-800: #2E7D32;
+  --clr-primary-800: #2E7D32; /* Core Brand Green */
   --clr-primary-700: #388E3C;
   --clr-primary-600: #43A047;
+  --clr-primary-500: #66BB6A;
+  --clr-primary-400: #81C784;
+  --clr-primary-300: #A5D6A7;
   --clr-primary-200: #C8E6C9;
   --clr-primary-100: #E8F5E9;
-  --clr-primary-50:  #EDF7EE;
+  --clr-primary-50:  #F1F8E9;
 
-  --clr-navy-900:    #0F2744;
-  --clr-navy-800:    #1E3A8A;
-  --clr-navy-700:    #2563EB;
+  /* ── e-Samanvit Warm Gold / Earth Accents ──────────────────── */
+  --clr-accent-700: #EF8C00;
+  --clr-accent-600: #F9A825;
+  --clr-accent-500: #FBC02D;
+  --clr-accent-400: #FDD835;
+  --clr-accent-100: #FFF8E1;
 
-  --clr-white:       #FFFFFF;
-  --clr-gray-50:     #F8FAFC;
-  --clr-gray-100:    #F1F5F9;
-  --clr-gray-200:    #E2E8F0;
-  --clr-gray-300:    #CBD5E1;
-  --clr-gray-400:    #94A3B8;
-  --clr-gray-500:    #64748B;
-  --clr-gray-700:    #334155;
-  --clr-gray-800:    #1E293B;
-  --clr-gray-900:    #0F172A;
+  /* ── e-Samanvit Warm-Tinted Neutrals ──────────────────────── */
+  --clr-white:      #FFFFFF;
+  --clr-gray-50:    #FAFAF8;
+  --clr-gray-100:   #F5F5F2;
+  --clr-gray-200:   #ECECEA;
+  --clr-gray-300:   #E0DFDC;
+  --clr-gray-400:   #BDBDB8;
+  --clr-gray-500:   #9E9E98;
+  --clr-gray-600:   #72726C;
+  --clr-gray-700:   #56564F;
+  --clr-gray-800:   #3A3A35;
+  --clr-gray-900:   #1E1E1B;
 
-  /* ── IMD Standard Alerts ─────────────────────────────────── */
-  --alert-green:     #15803D;
-  --alert-green-bg:  #DCFCE7;
-  --alert-green-bdr: #BBF7D0;
+  /* ── Meteorological & IMD Standard Alert Statuses ─────────── */
+  --alert-green:     #2E7D32;
+  --alert-green-bg:  #E8F5E9;
+  --alert-green-bdr: #C8E6C9;
 
-  --alert-yellow:    #854D0E;
-  --alert-yellow-bg: #FEF9C3;
-  --alert-yellow-bdr:#FEF08A;
+  --alert-yellow:    #B45309;
+  --alert-yellow-bg: #FEF3C7;
+  --alert-yellow-bdr:#FDE68A;
 
   --alert-orange:    #C2410C;
   --alert-orange-bg: #FFEDD5;
@@ -45,18 +54,36 @@
   --alert-red-bg:    #FEE2E2;
   --alert-red-bdr:   #FECACA;
 
-  /* ── Typography & Shadows ────────────────────────────────── */
-  --font-family:     'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --shadow-sm:       0 1px 3px rgba(30,30,27,0.05), 0 1px 2px rgba(30,30,27,0.03);
-  --shadow-md:       0 2px 8px rgba(46,125,50,0.08), 0 1px 3px rgba(0,0,0,0.04);
-  --shadow-lg:       0 4px 20px rgba(46,125,50,0.12), 0 2px 6px rgba(0,0,0,0.05);
-  --shadow-drawer:   -4px 0 28px rgba(15,23,42,0.18);
+  --alert-info:      #1565C0;
+  --alert-info-bg:   #E3F2FD;
+  --alert-info-bdr:  #BBDEFB;
 
-  --radius-sm:       6px;
-  --radius-md:       10px;
-  --radius-lg:       14px;
-  --radius-xl:       20px;
-  --radius-full:     9999px;
+  /* ── Typography & Shadows ────────────────────────────────── */
+  --font-family:    'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --shadow-sm:      0 1px 3px rgba(30,30,27,0.04), 0 1px 2px rgba(30,30,27,0.03);
+  --shadow-md:      0 2px 8px rgba(30,30,27,0.06), 0 1px 3px rgba(30,30,27,0.04);
+  --shadow-lg:      0 4px 20px rgba(30,30,27,0.07), 0 2px 6px rgba(30,30,27,0.03);
+  --shadow-xl:      0 8px 40px rgba(30,30,27,0.08), 0 4px 12px rgba(30,30,27,0.03);
+  --shadow-card:    0 1px 4px rgba(30,30,27,0.04), 0 2px 12px rgba(30,30,27,0.03);
+  --shadow-glow:    0 4px 24px rgba(46,125,50,0.12);
+  --shadow-drawer:  -4px 0 28px rgba(30,30,27,0.18);
+
+  /* ── Border Radius Scale ─────────────────────────────────── */
+  --radius-sm:      6px;
+  --radius-md:      10px;
+  --radius-lg:      14px;
+  --radius-xl:      20px;
+  --radius-2xl:     28px;
+  --radius-full:    9999px;
+
+  /* ── Transitions & Layout ────────────────────────────────── */
+  --ease-out:       cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-gentle:    cubic-bezier(0.25, 0.8, 0.25, 1);
+  --duration-fast:  180ms;
+  --duration-normal:300ms;
+  --duration-slow:  500ms;
+  --navbar-height:  64px;
+  --footer-bg:      #1A3320;
 }
 
 /* ── Reset & Base Styles ───────────────────────────────────── */
@@ -72,13 +99,14 @@ html, body {
   margin: 0;
   padding: 0;
   background-color: var(--clr-gray-50);
-  color: var(--clr-gray-900);
+  color: var(--clr-gray-800);
   font-family: var(--font-family);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  letter-spacing: -0.01em;
 }
 
-/* ── Common Utilities & Layout ─────────────────────────────── */
+/* ── Common App Shell ──────────────────────────────────────── */
 .app-container {
   width: 100vw;
   height: 100vh;
@@ -88,123 +116,227 @@ html, body {
   background-color: var(--clr-gray-50);
 }
 
-/* ── Top Header Row 1: Brand Bar ───────────────────────────── */
+.tab-transition-view {
+  width: 100%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
+}
+
+/* ── e-Samanvit National Tricolor Accent Divider ───────────── */
+.tricolor-bar {
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, #FF9933 0%, #FF9933 33.33%, #FFFFFF 33.33%, #FFFFFF 66.66%, #138808 66.66%, #138808 100%);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 45;
+}
+
+/* ── Top Header Row 1: Brand Bar (e-Samanvit Signature White Theme) ── */
 .brand-header {
   height: 64px;
-  background-color: var(--clr-white);
-  border-bottom: 1px solid var(--clr-gray-200);
+  background-color: var(--clr-primary-50, #EDF7EE);
+  border-bottom: 1px solid var(--clr-primary-200, #C8E6C9);
   padding: 0 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   z-index: 40;
   flex-shrink: 0;
+  box-shadow: 0 1px 4px rgba(27, 94, 32, 0.05);
 }
 
 .brand-left {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
   cursor: pointer;
 }
 
 .brand-logo-frame {
-  width: 46px;
-  height: 46px;
-  border-radius: var(--radius-full);
-  border: 2px solid var(--clr-primary-200);
-  box-shadow: var(--shadow-sm);
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: none;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.10);
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--clr-white);
+  background: #FFFFFF;
   flex-shrink: 0;
 }
 
 .brand-logo-frame img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  border-radius: 50%;
+  clip-path: circle(49% at 50% 50%);
 }
 
 .brand-titles {
   display: flex;
-  flex-direction: column;
-}
-
-.brand-name-row {
-  display: flex;
   align-items: center;
-  gap: 8px;
 }
 
 .brand-title {
   font-size: 20px;
   font-weight: 800;
-  color: var(--clr-primary-900);
+  color: #111827;
   letter-spacing: -0.02em;
+  line-height: 1.1;
 }
 
-.brand-badge {
-  font-size: 11px;
-  font-weight: 700;
-  background-color: var(--clr-primary-100);
-  color: var(--clr-primary-800);
-  padding: 2px 8px;
+.brand-divider {
+  width: 1.5px;
+  height: 28px;
+  background: var(--clr-gray-300, #E0DFDC);
+  margin: 0 12px;
+}
+
+.digital-india-container {
+  display: flex;
+  align-items: center;
+}
+
+/* Photo 1: Capsule Pill Language Button */
+.lang-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #FFFFFF;
+  color: #374151;
+  border: 1.5px solid var(--clr-gray-300, #D1D5DB);
   border-radius: var(--radius-full);
-  border: 1px solid var(--clr-primary-200);
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  transition: all var(--duration-fast) var(--ease-out);
 }
 
-.brand-subtitle {
-  font-size: 12px;
-  color: var(--clr-gray-500);
-  font-weight: 500;
+.lang-pill-btn:hover {
+  background-color: var(--clr-gray-50);
+  border-color: var(--clr-primary-400);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
 .hamburger-btn {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 14px;
-  background-color: var(--clr-primary-100);
-  border: 1px solid var(--clr-primary-200);
-  color: var(--clr-primary-900);
+  padding: 7px 14px;
+  background-color: var(--clr-primary-50, #F1F8E9);
+  border: 1.5px solid var(--clr-primary-200, #C8E6C9);
+  color: var(--clr-primary-900, #1B5E20);
   border-radius: var(--radius-md);
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
   box-shadow: var(--shadow-sm);
-  transition: all 0.2s ease;
+  transition: all var(--duration-fast) var(--ease-out);
 }
 
 .hamburger-btn:hover {
-  background-color: var(--clr-primary-200);
+  background-color: var(--clr-primary-100, #E8F5E9);
+  border-color: var(--clr-primary-300, #A5D6A7);
 }
 
-/* ── Top Header Row 2: Navigation Bar ──────────────────────── */
+/* ── Top Header Row 2: Navigation Bar (e-Samanvit Centered Layout) ── */
 .main-navbar {
-  height: 46px;
-  background-color: var(--clr-gray-100);
+  height: 52px;
+  background-color: var(--clr-white);
+  border-top: 1px solid var(--clr-gray-200);
   border-bottom: 1px solid var(--clr-gray-200);
   padding: 0 24px;
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  justify-content: space-between;
   z-index: 30;
   flex-shrink: 0;
+  box-shadow: 0 1px 4px rgba(30, 30, 27, 0.03);
 }
 
-.nav-tabs {
+.nav-left-slot {
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: flex-start;
+}
+
+.nav-center-slot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-right-slot {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+/* Operational Status Pill in Left Slot */
+.live-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background-color: var(--clr-primary-50);
+  border: 1px solid var(--clr-primary-200);
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--clr-primary-800);
+  letter-spacing: 0.02em;
+}
+
+.live-pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: var(--clr-primary-600);
+  box-shadow: 0 0 0 0 rgba(67, 160, 71, 0.7);
+  animation: pulseGreen 2s infinite;
+}
+
+@keyframes pulseGreen {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(67, 160, 71, 0.7);
+  }
+  70% {
+    transform: scale(1.1);
+    box-shadow: 0 0 0 6px rgba(67, 160, 71, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(67, 160, 71, 0);
+  }
+}
+
+/* Centered Tab Container matching e-Samanvit design */
+.nav-tabs-pill-container {
+  display: flex;
+  align-items: center;
+  background-color: transparent;
+  padding: 2px;
+  border-radius: var(--radius-full);
+  border: none;
+  gap: 6px;
+  position: relative;
 }
 
 .nav-tab-btn {
-  padding: 6px 16px;
-  border-radius: var(--radius-sm);
-  font-size: 13px;
+  padding: 7px 18px 8px 18px;
+  border-radius: var(--radius-md);
+  font-size: 13.5px;
   font-weight: 600;
   color: var(--clr-gray-700);
   background: transparent;
@@ -212,20 +344,54 @@ html, body {
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 6px;
-  transition: all 0.18s ease;
+  gap: 7px;
+  transition: all var(--duration-fast) var(--ease-out);
+  position: relative;
+  user-select: none;
 }
 
 .nav-tab-btn:hover {
   color: var(--clr-primary-900);
-  background-color: rgba(200, 230, 201, 0.4);
+  background-color: var(--clr-primary-50);
 }
 
 .nav-tab-btn.active {
-  background-color: var(--clr-primary-800);
-  color: var(--clr-white);
+  background-color: var(--clr-primary-100);
+  color: var(--clr-primary-800);
   font-weight: 700;
-  box-shadow: var(--shadow-sm);
+}
+
+.nav-tab-btn.active svg {
+  stroke: var(--clr-primary-800);
+}
+
+/* Distinctive e-Samanvit indicator bar */
+.nav-tab-btn.active::after {
+  content: "";
+  position: absolute;
+  bottom: 2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 26px;
+  height: 3px;
+  border-radius: var(--radius-full);
+  background: linear-gradient(90deg, var(--clr-primary-700) 0%, var(--clr-accent-600) 100%);
+  box-shadow: 0 1px 3px rgba(46, 125, 50, 0.35);
+}
+
+.nav-tab-badge {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  padding: 1px 6px;
+  border-radius: var(--radius-full);
+  background: var(--clr-primary-800);
+  color: var(--clr-white);
+}
+
+.nav-tab-btn:not(.active) .nav-tab-badge {
+  background: var(--clr-gray-200);
+  color: var(--clr-gray-700);
 }
 
 .nav-right-clock {
@@ -233,22 +399,25 @@ html, body {
   align-items: center;
   gap: 8px;
   background-color: var(--clr-white);
-  border: 1px solid var(--clr-gray-200);
-  padding: 4px 10px;
+  border: 1px solid var(--clr-gray-300);
+  padding: 4px 12px;
   border-radius: var(--radius-sm);
   font-size: 12px;
+  box-shadow: var(--shadow-sm);
 }
 
 .clock-dot {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
-  background-color: #10B981;
+  background-color: var(--clr-primary-600);
+  box-shadow: 0 0 6px rgba(67, 160, 71, 0.6);
+  animation: pulseGreen 2s infinite;
 }
 
 .clock-label {
   color: var(--clr-gray-500);
-  font-weight: 600;
+  font-weight: 700;
   font-size: 11px;
 }
 
@@ -258,25 +427,141 @@ html, body {
   font-family: monospace;
 }
 
-/* ── Cards & Panels (e-Samanvit Master Style) ──────────────── */
-.esam-card {
-  background-color: var(--clr-white);
-  border: 1px solid var(--clr-gray-200);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
-  transition: all 0.2s ease;
+/* ── Smooth Page Transition Effect ─────────────────────────── */
+@keyframes pageViewTransition {
+  0% {
+    opacity: 0.2;
+    transform: translateY(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-.esam-card:hover {
+.tab-transition-view {
+  animation: pageViewTransition 0.25s var(--ease-out) forwards;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  position: relative;
+}
+
+/* ── e-Samanvit Cards & Panels ─────────────────────────────── */
+.card, .esam-card {
+  background-color: var(--clr-white);
+  border: 1px solid var(--clr-gray-200);
+  border-radius: var(--radius-xl);
+  padding: 24px;
+  box-shadow: var(--shadow-card);
+  transition: box-shadow var(--duration-normal) var(--ease-out),
+              transform var(--duration-normal) var(--ease-out),
+              border-color var(--duration-normal) var(--ease-out);
+}
+
+.card:hover, .esam-card:hover {
   border-color: var(--clr-primary-200);
   box-shadow: var(--shadow-lg);
+}
+
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.card-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
+  flex-shrink: 0;
+}
+
+.card-icon-green  { background: var(--clr-primary-100); color: var(--clr-primary-800); border: 1px solid var(--clr-primary-200); }
+.card-icon-gold   { background: var(--clr-accent-100);  color: var(--clr-accent-700);  border: 1px solid #FFE082; }
+.card-icon-blue   { background: var(--alert-info-bg);   color: var(--alert-info);      border: 1px solid var(--alert-info-bdr); }
+.card-icon-orange { background: var(--alert-orange-bg); color: var(--alert-orange);    border: 1px solid var(--alert-orange-bdr); }
+.card-icon-red    { background: var(--alert-red-bg);    color: var(--alert-red);       border: 1px solid var(--alert-red-bdr); }
+
+/* ── e-Samanvit Buttons ────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  transition: all var(--duration-fast) var(--ease-out);
+  border: 1.5px solid transparent;
+  cursor: pointer;
+  line-height: 1.35;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.btn-primary {
+  background: var(--clr-primary-800);
+  color: var(--clr-white);
+  border-color: var(--clr-primary-800);
+  box-shadow: 0 2px 8px rgba(46, 125, 50, 0.20);
+}
+
+.btn-primary:hover {
+  background: var(--clr-primary-900);
+  border-color: var(--clr-primary-900);
+  box-shadow: 0 4px 16px rgba(27, 94, 32, 0.28);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: var(--clr-white);
+  color: var(--clr-primary-800);
+  border-color: var(--clr-primary-300);
+}
+
+.btn-secondary:hover {
+  background: var(--clr-primary-50);
+  border-color: var(--clr-primary-500);
+}
+
+/* ── e-Samanvit Chips ──────────────────────────────────────── */
+.esam-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--clr-primary-100);
+  color: var(--clr-primary-800);
+  border: 1px solid var(--clr-primary-200);
+  border-radius: var(--radius-full);
+  padding: 5px 13px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+/* ── Floating Map Inspector & Dashboard Panels ─────────────── */
+.floating-inspector-card {
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1.5px solid var(--clr-primary-200);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  transition: all var(--duration-fast) var(--ease-out);
 }
 
 .floating-panel {
   background: rgba(255, 255, 255, 0.98);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid var(--clr-gray-200);
+  border: 1px solid var(--clr-gray-300);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
   overflow: hidden;
@@ -284,7 +569,7 @@ html, body {
   flex-direction: column;
 }
 
-/* ── Badges ────────────────────────────────────────────────── */
+/* ── Weather Semantic Badges ───────────────────────────────── */
 .badge-green {
   background-color: var(--alert-green-bg);
   color: var(--alert-green);
@@ -313,7 +598,7 @@ html, body {
 .leaflet-container {
   width: 100% !important;
   height: 100% !important;
-  background-color: #F8FAFC !important;
+  background-color: #FAFAF8 !important;
 }
 
 .leaflet-control-zoom {
@@ -335,7 +620,7 @@ html, body {
   color: var(--clr-primary-900) !important;
 }
 
-/* ── Map Top Controls (Google Maps Style) ───────────────────── */
+/* ── Map Top Controls (Professional Map Switcher) ──────────── */
 .map-top-bar {
   position: absolute;
   top: 16px;
@@ -348,7 +633,7 @@ html, body {
 
 .map-type-toggle {
   background-color: var(--clr-white);
-  border: 1px solid var(--clr-gray-300);
+  border: 1.5px solid var(--clr-primary-200);
   border-radius: var(--radius-md);
   padding: 3px;
   display: flex;
@@ -363,11 +648,12 @@ html, body {
   font-weight: 700;
   border: none;
   background: transparent;
-  color: var(--clr-gray-600);
+  color: var(--clr-gray-700);
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
+  transition: all var(--duration-fast);
 }
 
 .map-type-btn.active {
@@ -377,41 +663,45 @@ html, body {
 
 .map-reset-btn {
   background-color: var(--clr-white);
-  border: 1px solid var(--clr-gray-300);
+  border: 1.5px solid var(--clr-primary-200);
   border-radius: var(--radius-md);
   padding: 7px 14px;
   font-size: 12px;
   font-weight: 700;
-  color: var(--clr-gray-800);
+  color: var(--clr-primary-900);
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 6px;
   box-shadow: var(--shadow-md);
+  transition: all var(--duration-fast);
 }
 
 .map-reset-btn:hover {
-  background-color: var(--clr-gray-100);
+  background-color: var(--clr-primary-50);
 }
 
 /* ── Bottom Time Scrubber ──────────────────────────────────── */
 .bottom-scrubber-bar {
   position: absolute;
-  bottom: 14px;
+  bottom: 16px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 1000;
-  width: 90%;
-  max-width: 820px;
+  width: min(680px, calc(100% - 28px));
+  max-width: 680px;
   background-color: rgba(255, 255, 255, 0.98);
-  border: 1px solid var(--clr-gray-200);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1.5px solid var(--clr-primary-200);
   border-radius: var(--radius-lg);
-  padding: 10px 18px;
-  box-shadow: var(--shadow-lg);
+  padding: 8px 14px;
+  box-shadow: 0 8px 30px rgba(30, 30, 27, 0.12);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: 12px;
+  transition: all var(--duration-fast);
 }
 
 /* ── Scrollbars ────────────────────────────────────────────── */
@@ -431,4 +721,472 @@ html, body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--clr-gray-400);
+}
+
+/* ============================================================
+   DARK MODE THEME SYSTEM (e-Samanvit Balanced Forest Palette)
+   ============================================================ */
+:root[data-theme="dark"],
+html.dark {
+  --clr-primary-900: #81C784;
+  --clr-primary-800: #43A047;
+  --clr-primary-700: #66BB6A;
+  --clr-primary-600: #81C784;
+  --clr-primary-300: #2D5A2D;
+  --clr-primary-200: #254B25;
+  --clr-primary-100: #1B351B;
+  --clr-primary-50:  #142414;
+
+  --clr-white:       #1E261E;
+  --clr-gray-50:     #141914;
+  --clr-gray-100:    #1A211A;
+  --clr-gray-200:    #263326;
+  --clr-gray-300:    #354835;
+  --clr-gray-400:    #657D65;
+  --clr-gray-500:    #8E9E8E;
+  --clr-gray-600:    #B2C2B2;
+  --clr-gray-700:    #D5E5D5;
+  --clr-gray-800:    #EAF3EA;
+  --clr-gray-900:    #F6FAF6;
+
+  --alert-green-bg:  #102812;
+  --alert-green:     #81C784;
+  --alert-green-bdr: #2D5A2D;
+
+  --alert-yellow-bg: #2E2008;
+  --alert-yellow:    #FBBF24;
+  --alert-yellow-bdr:#78350F;
+
+  --alert-orange-bg: #331A0B;
+  --alert-orange:    #FB923C;
+  --alert-orange-bdr:#831843;
+
+  --alert-red-bg:    #351111;
+  --alert-red:       #F87171;
+  --alert-red-bdr:   #991B1B;
+}
+
+[data-theme="dark"] body,
+[data-theme="dark"] .app-container {
+  background-color: #141914 !important;
+  color: #EAF3EA !important;
+}
+
+[data-theme="dark"] .brand-header,
+[data-theme="dark"] .main-navbar {
+  background-color: #1A211A !important;
+  border-bottom-color: #2D5A2D !important;
+  color: #F6FAF6 !important;
+}
+
+[data-theme="dark"] .brand-title {
+  color: #FFFFFF !important;
+}
+
+[data-theme="dark"] .brand-logo-frame {
+  background: #FFFFFF !important;
+  border: none !important;
+}
+
+[data-theme="dark"] .card,
+[data-theme="dark"] .esam-card,
+[data-theme="dark"] .floating-inspector-card,
+[data-theme="dark"] .floating-panel {
+  background-color: #1E261E !important;
+  border-color: #2D5A2D !important;
+  color: #EAF3EA !important;
+}
+
+[data-theme="dark"] .main-navbar {
+  background-color: #1A211A !important;
+  border-top-color: #2D5A2D !important;
+  border-bottom-color: #2D5A2D !important;
+}
+
+[data-theme="dark"] .nav-tabs-pill-container {
+  background-color: transparent !important;
+  border: none !important;
+}
+
+[data-theme="dark"] .nav-tab-btn {
+  color: #B2C2B2 !important;
+}
+
+[data-theme="dark"] .nav-tab-btn:hover {
+  color: #81C784 !important;
+  background-color: rgba(67, 160, 71, 0.15) !important;
+}
+
+[data-theme="dark"] .nav-tab-btn.active {
+  background-color: #1B351B !important;
+  color: #81C784 !important;
+}
+
+[data-theme="dark"] .nav-tab-btn.active svg {
+  stroke: #81C784 !important;
+}
+
+[data-theme="dark"] .nav-tab-btn.active::after {
+  background: linear-gradient(90deg, #43A047 0%, #F59E0B 100%) !important;
+  box-shadow: 0 1px 4px rgba(67, 160, 71, 0.4) !important;
+}
+
+[data-theme="dark"] .nav-right-clock {
+  background-color: #1E261E !important;
+  border-color: #2D5A2D !important;
+  color: #EAF3EA !important;
+}
+
+[data-theme="dark"] .clock-time {
+  color: #81C784 !important;
+}
+
+[data-theme="dark"] .live-status-pill {
+  background-color: #1B351B !important;
+  border-color: #2D5A2D !important;
+  color: #81C784 !important;
+}
+
+[data-theme="dark"] .bottom-scrubber-bar {
+  background-color: rgba(30, 38, 30, 0.96) !important;
+  border-color: #2D5A2D !important;
+  color: #EAF3EA !important;
+}
+
+[data-theme="dark"] aside {
+  background-color: #1A211A !important;
+  border-color: #2D5A2D !important;
+  color: #EAF3EA !important;
+}
+
+[data-theme="dark"] .map-type-toggle,
+[data-theme="dark"] .map-reset-btn {
+  background-color: #1E261E !important;
+  border-color: #2D5A2D !important;
+  color: #EAF3EA !important;
+}
+
+[data-theme="dark"] .leaflet-container {
+  background-color: #141914 !important;
+}
+
+[data-theme="dark"] .leaflet-control-zoom a {
+  background-color: #1E261E !important;
+  color: #EAF3EA !important;
+  border-color: #2D5A2D !important;
+}
+
+[data-theme="dark"] .mobile-view-toggle-bar {
+  background-color: rgba(30, 38, 30, 0.96) !important;
+  border-color: #2D5A2D !important;
+}
+
+/* ============================================================
+   DESKTOP & MOBILE RESPONSIVE LAYOUT
+   ============================================================ */
+.station-inspector-card {
+  position: absolute;
+  top: 60px;
+  left: 354px;
+  width: 310px;
+}
+
+.storm-inspector-card {
+  position: absolute;
+  top: 60px;
+  right: 354px;
+  width: 310px;
+}
+
+.dashboard-panel-left {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  bottom: 86px;
+  z-index: 500;
+  pointer-events: auto;
+}
+
+.dashboard-panel-right {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  bottom: 86px;
+  z-index: 500;
+  pointer-events: auto;
+}
+
+.mobile-view-toggle-bar,
+.mobile-map-quick-boxes {
+  display: none;
+}
+
+/* ── Mobile Layout Adjustments (Screen Width <= 768px) ────── */
+@media (max-width: 768px) {
+  .brand-header {
+    height: 54px;
+    padding: 0 10px;
+  }
+
+  .brand-left {
+    gap: 8px;
+  }
+
+  .brand-logo-frame {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+  }
+
+  .brand-title {
+    font-size: 15.5px;
+    letter-spacing: -0.01em;
+  }
+
+  .brand-subtitle {
+    display: none;
+  }
+
+  .lang-pill-btn {
+    padding: 5px 10px;
+    font-size: 11.5px;
+    gap: 5px;
+  }
+
+  .hamburger-btn {
+    padding: 5px 9px;
+    font-size: 11px;
+    gap: 4px;
+  }
+
+  .hamburger-btn svg {
+    width: 17px;
+    height: 17px;
+  }
+
+  .main-navbar {
+    height: 44px;
+    padding: 0 6px;
+    grid-template-columns: auto;
+    display: flex;
+    justify-content: center;
+  }
+
+  .nav-left-slot,
+  .nav-right-slot {
+    display: none !important;
+  }
+
+  .nav-tabs-pill-container {
+    padding: 2px;
+    gap: 3px;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .nav-tab-btn {
+    padding: 5px 8px;
+    font-size: 11px;
+    gap: 3px;
+    flex-shrink: 0;
+  }
+
+  .nav-tab-btn svg {
+    width: 13px;
+    height: 13px;
+  }
+
+  .nav-tab-badge {
+    display: none;
+  }
+
+  .dashboard-panel-left.mobile-hide,
+  .dashboard-panel-right.mobile-hide {
+    display: none !important;
+  }
+
+  .mobile-map-quick-boxes {
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    position: absolute;
+    top: 10px;
+    left: 8px;
+    right: 8px;
+    z-index: 550;
+    pointer-events: auto;
+  }
+
+  .mobile-floating-pill {
+    flex: 1;
+    min-width: 0;
+    padding: 8px 12px;
+    background-color: #FFFFFF;
+    border: 1.5px solid var(--clr-primary-300, #A5D6A7);
+    border-radius: 10px;
+    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--clr-primary-900, #1B5E20);
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(46, 125, 50, 0.14);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    white-space: nowrap;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .mobile-floating-pill:active,
+  .mobile-floating-pill.active {
+    background-color: var(--clr-primary-50, #EDF7EE);
+    border-color: var(--clr-primary-600, #43A047);
+    box-shadow: 0 2px 8px rgba(46, 125, 50, 0.22);
+  }
+
+  .dashboard-panel-left.mobile-hide,
+  .dashboard-panel-right.mobile-hide {
+    display: none !important;
+  }
+
+  .dashboard-panel-left.mobile-show,
+  .dashboard-panel-right.mobile-show {
+    display: flex !important;
+    position: absolute !important;
+    top: 8px !important;
+    left: 8px !important;
+    right: 8px !important;
+    bottom: 84px !important;
+    width: auto !important;
+    max-width: calc(100vw - 16px) !important;
+    z-index: 600 !important;
+    pointer-events: auto !important;
+    border-radius: 12px !important;
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.22) !important;
+    animation: mobileSheetIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+
+  @keyframes mobileSheetIn {
+    from {
+      opacity: 0;
+      transform: translateY(16px) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  .mobile-view-toggle-bar {
+    display: none !important;
+  }
+
+  .time-scrubber-telemetry,
+  .map-legend-bar {
+    display: none !important;
+  }
+
+  .bottom-scrubber-bar {
+    width: calc(100% - 16px) !important;
+    bottom: 8px !important;
+    padding: 6px 10px !important;
+    gap: 8px !important;
+    border-radius: 10px !important;
+  }
+
+  .station-inspector-card,
+  .storm-inspector-card {
+    position: absolute !important;
+    top: 54px !important;
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%) !important;
+    width: min(320px, calc(100vw - 20px)) !important;
+    max-width: 320px !important;
+    z-index: 700 !important;
+  }
+}
+
+/* ============================================================
+   INTERACTIVE ACTION FEEDBACK & VISIBLE HIGHLIGHTS
+   ============================================================ */
+@keyframes toastSlideBounce {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -18px) scale(0.92);
+  }
+  60% {
+    opacity: 1;
+    transform: translate(-50%, 3px) scale(1.02);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+}
+
+@keyframes panelActionPulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(46, 125, 50, 0.75), 0 8px 30px rgba(46, 125, 50, 0.3);
+  }
+  25% {
+    transform: scale(1.025);
+    box-shadow: 0 0 0 8px rgba(46, 125, 50, 0.55), 0 16px 48px rgba(46, 125, 50, 0.45);
+  }
+  50% {
+    transform: scale(1.01);
+    box-shadow: 0 0 0 4px rgba(46, 125, 50, 0.35), 0 10px 36px rgba(46, 125, 50, 0.3);
+  }
+  75% {
+    transform: scale(1.018);
+    box-shadow: 0 0 0 6px rgba(46, 125, 50, 0.4), 0 12px 40px rgba(46, 125, 50, 0.35);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: var(--shadow-elevated, 0 8px 30px rgba(0,0,0,0.15));
+  }
+}
+
+.panel-action-pulse {
+  animation: panelActionPulse 2.2s cubic-bezier(0.25, 0.8, 0.25, 1) forwards !important;
+  z-index: 1000 !important;
+  border-radius: var(--radius-lg) !important;
+}
+
+@keyframes scrubberActionPulse {
+  0% {
+    transform: translateX(-50%) scale(1);
+    box-shadow: 0 0 0 0 rgba(239, 140, 0, 0.75);
+  }
+  25% {
+    transform: translateX(-50%) scale(1.03);
+    box-shadow: 0 0 0 8px rgba(239, 140, 0, 0.5), 0 12px 36px rgba(239, 140, 0, 0.4);
+  }
+  100% {
+    transform: translateX(-50%) scale(1);
+    box-shadow: var(--shadow-card);
+  }
+}
+
+.scrubber-action-pulse {
+  animation: scrubberActionPulse 2.2s cubic-bezier(0.25, 0.8, 0.25, 1) forwards !important;
+  border-color: var(--clr-accent-700, #EF8C00) !important;
+}
+
+@media (max-width: 768px) {
+  .action-feedback-toast {
+    top: 106px !important;
+    padding: 6px 14px !important;
+    gap: 8px !important;
+    width: min(340px, calc(100vw - 24px)) !important;
+  }
 }
